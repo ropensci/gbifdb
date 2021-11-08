@@ -61,7 +61,6 @@ devtools::install_github("cboettig/gbifdb")
 ``` r
 library(gbifdb)
 library(dplyr)  # optional, for dplyr-based operations
-library(aws.s3) # optional, for S3-based sync
 ```
 
 Before you can use `gbifdb` you will need to download GBIF data.
@@ -78,7 +77,8 @@ software.
 
 Once you have downloaded the parquet-formatted GBIF data, simply point
 `gbif_conn()` at the directory containing your parquet files to
-initialize a connection.
+initialize a connection. (By default, `gbif_conn()` will look for data
+in the configurable directory given by `gbif_dir()`).
 
 ``` r
 conn <- gbif_conn()
