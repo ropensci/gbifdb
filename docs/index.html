@@ -152,48 +152,93 @@ install.packages("gbifdb")
 <span class="co">#&gt; #   occurrencestatus &lt;chr&gt;, individualcount &lt;int&gt;, publishingorgkey &lt;chr&gt;,</span>
 <span class="co">#&gt; #   decimallatitude &lt;dbl&gt;, decimallongitude &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   coordinateuncertaintyinmeters &lt;dbl&gt;, coordinateprecision &lt;dbl&gt;, …</span></code></pre></div>
-<p>Now, we can use <code>dplyr</code> to perform standard queries:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">gbif</span>, <span class="va">phylum</span>, <span class="va">countrycode</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">phyla</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">gbif</span><span class="op">)</span>
+<span class="co">#&gt;  [1] "gbifid"                           "datasetkey"                      </span>
+<span class="co">#&gt;  [3] "occurrenceid"                     "kingdom"                         </span>
+<span class="co">#&gt;  [5] "phylum"                           "class"                           </span>
+<span class="co">#&gt;  [7] "order"                            "family"                          </span>
+<span class="co">#&gt;  [9] "genus"                            "species"                         </span>
+<span class="co">#&gt; [11] "infraspecificepithet"             "taxonrank"                       </span>
+<span class="co">#&gt; [13] "scientificname"                   "verbatimscientificname"          </span>
+<span class="co">#&gt; [15] "verbatimscientificnameauthorship" "countrycode"                     </span>
+<span class="co">#&gt; [17] "locality"                         "stateprovince"                   </span>
+<span class="co">#&gt; [19] "occurrencestatus"                 "individualcount"                 </span>
+<span class="co">#&gt; [21] "publishingorgkey"                 "decimallatitude"                 </span>
+<span class="co">#&gt; [23] "decimallongitude"                 "coordinateuncertaintyinmeters"   </span>
+<span class="co">#&gt; [25] "coordinateprecision"              "elevation"                       </span>
+<span class="co">#&gt; [27] "elevationaccuracy"                "depth"                           </span>
+<span class="co">#&gt; [29] "depthaccuracy"                    "eventdate"                       </span>
+<span class="co">#&gt; [31] "day"                              "month"                           </span>
+<span class="co">#&gt; [33] "year"                             "taxonkey"                        </span>
+<span class="co">#&gt; [35] "specieskey"                       "basisofrecord"                   </span>
+<span class="co">#&gt; [37] "institutioncode"                  "collectioncode"                  </span>
+<span class="co">#&gt; [39] "catalognumber"                    "recordnumber"                    </span>
+<span class="co">#&gt; [41] "identifiedby"                     "dateidentified"                  </span>
+<span class="co">#&gt; [43] "license"                          "rightsholder"                    </span>
+<span class="co">#&gt; [45] "recordedby"                       "typestatus"                      </span>
+<span class="co">#&gt; [47] "establishmentmeans"               "lastinterpreted"                 </span>
+<span class="co">#&gt; [49] "mediatype"                        "issue"</span></code></pre></div>
+<p>Now, we can use <code>dplyr</code> to perform standard queries: for instance, the number of unique species observed by country:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbif</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">countrycode</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">countrycode</span><span class="op">)</span>
+<span class="co">#&gt; # Source:   lazy query [?? x 2]</span>
+<span class="co">#&gt; # Database: duckdb_connection</span>
+<span class="co">#&gt;    countrycode      n</span>
+<span class="co">#&gt;    &lt;chr&gt;        &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 US          185986</span>
+<span class="co">#&gt;  2 GB           45065</span>
+<span class="co">#&gt;  3 HN           12430</span>
+<span class="co">#&gt;  4 ES           33794</span>
+<span class="co">#&gt;  5 BZ            9912</span>
+<span class="co">#&gt;  6 CR           44425</span>
+<span class="co">#&gt;  7 AU          122412</span>
+<span class="co">#&gt;  8 FI           24912</span>
+<span class="co">#&gt;  9 AR           28761</span>
+<span class="co">#&gt; 10 CO           42958</span>
+<span class="co">#&gt; # … with more rows</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">growth</span> <span class="op">&lt;-</span> <span class="va">gbif</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">phylum</span> <span class="op">==</span> <span class="st">"Chordata"</span>, <span class="va">year</span> <span class="op">&gt;</span> <span class="fl">1990</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">class</span>, <span class="va">year</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span>
+<span class="va">growth</span>
 <span class="co">#&gt; # Source:     lazy query [?? x 3]</span>
 <span class="co">#&gt; # Database:   duckdb_connection</span>
-<span class="co">#&gt; # Groups:     phylum</span>
-<span class="co">#&gt; # Ordered by: desc(n)</span>
-<span class="co">#&gt;    phylum       countrycode         n</span>
-<span class="co">#&gt;    &lt;chr&gt;        &lt;chr&gt;           &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 Chordata     US          501545951</span>
-<span class="co">#&gt;  2 Chordata     CA           74214109</span>
-<span class="co">#&gt;  3 Chordata     SE           70602442</span>
-<span class="co">#&gt;  4 Chordata     AU           46810397</span>
-<span class="co">#&gt;  5 Tracheophyta FR           29257364</span>
-<span class="co">#&gt;  6 Chordata     ZA           23833456</span>
-<span class="co">#&gt;  7 Chordata     NO           22963453</span>
-<span class="co">#&gt;  8 Chordata     BE           22436599</span>
-<span class="co">#&gt;  9 Tracheophyta DE           17970693</span>
-<span class="co">#&gt; 10 Tracheophyta AU           17701457</span>
+<span class="co">#&gt; # Groups:     class</span>
+<span class="co">#&gt; # Ordered by: year</span>
+<span class="co">#&gt;    class               year      n</span>
+<span class="co">#&gt;    &lt;chr&gt;              &lt;int&gt;  &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 Cephalaspidomorphi  1991   1152</span>
+<span class="co">#&gt;  2 Elasmobranchii      1991  17521</span>
+<span class="co">#&gt;  3 Ascidiacea          1991   1602</span>
+<span class="co">#&gt;  4 Thaliacea           1991    669</span>
+<span class="co">#&gt;  5 Amphibia            1991  18443</span>
+<span class="co">#&gt;  6 Sarcopterygii       1991     13</span>
+<span class="co">#&gt;  7 &lt;NA&gt;                1991    912</span>
+<span class="co">#&gt;  8 Leptocardii         1991     36</span>
+<span class="co">#&gt;  9 Actinopterygii      1991 363791</span>
+<span class="co">#&gt; 10 Holocephali         1991   1048</span>
 <span class="co">#&gt; # … with more rows</span></code></pre></div>
 <p>Recall that when using remote data sources in <code>dplyr</code>, the data remains in the database (i.e. on disk, not in working RAM). This is fine for any further operations using <code>dplyr</code>/<code>tidyr</code> functions which can be translated into SQL. Using such functions we can usually reduce our resulting table to something much smaller, which can then be pulled into memory in R for further analysis using <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">all_phyla</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="va">phyla</span><span class="op">)</span></code></pre></div>
-<p>We can now pass this table to other R functions, e.g. to plot our results:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
+<span class="va">growth</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="va">growth</span><span class="op">)</span>
 
-<span class="va">top_phyla</span> <span class="op">&lt;-</span> <span class="va">all_phyla</span> <span class="op">%&gt;%</span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">phylum</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">top_countries</span> <span class="op">&lt;-</span> <span class="va">all_phyla</span> <span class="op">%&gt;%</span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">countrycode</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="fu">fct_lump_n</span><span class="op">(</span><span class="va">growth</span><span class="op">$</span><span class="va">class</span>, <span class="fl">6</span><span class="op">)</span><span class="op">%&gt;%</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt;  [1] "Actinopterygii"     "Amphibia"           "Ascidiacea"        </span>
+<span class="co">#&gt;  [4] "Aves"               "Cephalaspidomorphi" "Elasmobranchii"    </span>
+<span class="co">#&gt;  [7] "Holocephali"        "Mammalia"           "Myxini"            </span>
+<span class="co">#&gt; [10] "Reptilia"           "Thaliacea"          "Other"</span>
+<span class="va">top_classes</span> <span class="op">&lt;-</span> <span class="va">growth</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">class</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="va">phyla_other</span> <span class="op">&lt;-</span> <span class="va">all_phyla</span> <span class="op">%&gt;%</span> 
-  <span class="fu">replace_na</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>phylum<span class="op">=</span><span class="st">"Other"</span>, countrycode<span class="op">=</span><span class="st">"Other"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>phylum <span class="op">=</span> <span class="fu">fct_other</span><span class="op">(</span><span class="va">phylum</span>, keep <span class="op">=</span> <span class="va">top_phyla</span><span class="op">)</span>,
-         countrycode <span class="op">=</span> <span class="fu">fct_other</span><span class="op">(</span><span class="va">countrycode</span>, keep <span class="op">=</span> <span class="va">top_countries</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">phylum</span>, <span class="va">countrycode</span><span class="op">)</span>  <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">phyla_other</span> <span class="op">%&gt;%</span> 
-  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">countrycode</span>, y <span class="op">=</span> <span class="va">n</span>, fill <span class="op">=</span> <span class="va">phylum</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu">geom_col</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
+<span class="co"># GBIF: the global bird information facility?</span>
+<span class="va">growth</span> <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>class <span class="op">=</span> <span class="fu">fct_lump_n</span><span class="op">(</span><span class="va">class</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">year</span>, <span class="va">n</span>, fill<span class="op">=</span><span class="va">class</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu">geom_col</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"GBIF observations by class"</span><span class="op">)</span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
 </div>
 </div>
   </div>
