@@ -1,9 +1,3 @@
-## Currently aws.s3 R package does not seem able to sync, though works fine 
-## via minio's `mc` or the aws cli client, etc. 
-## Alternately could support downloads with direct link, but maybe 
-## just fine to leave this up to the user.
-
-
 
 #' Download GBIF data using aws.s3 sync
 #' 
@@ -17,7 +11,10 @@
 #' 
 #' Note that data can also be found on the Microsoft Cloud,
 #' https://planetarycomputer.microsoft.com/dataset/gbif
-#' @noRd
+#' 
+#' Also, some users may prefer to download this data using an alternative
+#' interface or work on a cloud-host machine where data is already available.
+#' @export
 #' 
 #' @examplesIf interactive()
 #' gbif_download()
@@ -36,10 +33,10 @@ gbif_download <-
   ## Public access fails if user has a secret key configured
   Sys.unsetenv("AWS_SECRET_ACCESS_KEY")
   aws.s3::s3sync(dir,
-                 base_url = "amazonaws.com",
+                 base_url = "s3.amazonaws.com",
                  bucket = "gbif-open-data-ap-southeast-2",
                  prefix = version,
-                 region = "s3.ap-southeast-2")
+                 region = "ap-southeast-2")
 }
 
 

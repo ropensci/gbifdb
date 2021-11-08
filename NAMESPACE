@@ -2,4 +2,5 @@
 
 export(gbif_conn)
 export(gbif_dir)
+export(gbif_download)
 export(gbif_example_data)
