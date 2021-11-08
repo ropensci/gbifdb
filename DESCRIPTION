@@ -27,6 +27,7 @@ Imports:
 Suggests:
     spelling,
     dplyr,
+    dbplyr,
     testthat (>= 3.0.0),
     covr,
     knitr,
@@ -38,3 +39,4 @@ Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Config/testthat/edition: 3
+VignetteBuilder: knitr
