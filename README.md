@@ -113,27 +113,80 @@ gbif
 #> #   coordinateuncertaintyinmeters <dbl>, coordinateprecision <dbl>, …
 ```
 
-Now, we can use `dplyr` to perform standard queries:
+``` r
+colnames(gbif)
+#>  [1] "gbifid"                           "datasetkey"                      
+#>  [3] "occurrenceid"                     "kingdom"                         
+#>  [5] "phylum"                           "class"                           
+#>  [7] "order"                            "family"                          
+#>  [9] "genus"                            "species"                         
+#> [11] "infraspecificepithet"             "taxonrank"                       
+#> [13] "scientificname"                   "verbatimscientificname"          
+#> [15] "verbatimscientificnameauthorship" "countrycode"                     
+#> [17] "locality"                         "stateprovince"                   
+#> [19] "occurrencestatus"                 "individualcount"                 
+#> [21] "publishingorgkey"                 "decimallatitude"                 
+#> [23] "decimallongitude"                 "coordinateuncertaintyinmeters"   
+#> [25] "coordinateprecision"              "elevation"                       
+#> [27] "elevationaccuracy"                "depth"                           
+#> [29] "depthaccuracy"                    "eventdate"                       
+#> [31] "day"                              "month"                           
+#> [33] "year"                             "taxonkey"                        
+#> [35] "specieskey"                       "basisofrecord"                   
+#> [37] "institutioncode"                  "collectioncode"                  
+#> [39] "catalognumber"                    "recordnumber"                    
+#> [41] "identifiedby"                     "dateidentified"                  
+#> [43] "license"                          "rightsholder"                    
+#> [45] "recordedby"                       "typestatus"                      
+#> [47] "establishmentmeans"               "lastinterpreted"                 
+#> [49] "mediatype"                        "issue"
+```
+
+Now, we can use `dplyr` to perform standard queries: for instance, the
+number of unique species observed by country:
 
 ``` r
-phyla <- count(gbif, phylum, countrycode, sort = TRUE)
-phyla
+gbif %>% select(species, countrycode) %>%
+  distinct() %>% 
+  count(countrycode)
+#> # Source:   lazy query [?? x 2]
+#> # Database: duckdb_connection
+#>    countrycode      n
+#>    <chr>        <dbl>
+#>  1 US          185986
+#>  2 GB           45065
+#>  3 HN           12430
+#>  4 ES           33794
+#>  5 BZ            9912
+#>  6 CR           44425
+#>  7 AU          122412
+#>  8 FI           24912
+#>  9 AR           28761
+#> 10 CO           42958
+#> # … with more rows
+```
+
+``` r
+growth <- gbif %>% 
+  filter(phylum == "Chordata", year > 1990) %>%
+  count(class, year) %>% arrange(year)
+growth
 #> # Source:     lazy query [?? x 3]
 #> # Database:   duckdb_connection
-#> # Groups:     phylum
-#> # Ordered by: desc(n)
-#>    phylum       countrycode         n
-#>    <chr>        <chr>           <dbl>
-#>  1 Chordata     US          501545951
-#>  2 Chordata     CA           74214109
-#>  3 Chordata     SE           70602442
-#>  4 Chordata     AU           46810397
-#>  5 Tracheophyta FR           29257364
-#>  6 Chordata     ZA           23833456
-#>  7 Chordata     NO           22963453
-#>  8 Chordata     BE           22436599
-#>  9 Tracheophyta DE           17970693
-#> 10 Tracheophyta AU           17701457
+#> # Groups:     class
+#> # Ordered by: year
+#>    class               year      n
+#>    <chr>              <int>  <dbl>
+#>  1 Cephalaspidomorphi  1991   1152
+#>  2 Elasmobranchii      1991  17521
+#>  3 Ascidiacea          1991   1602
+#>  4 Thaliacea           1991    669
+#>  5 Amphibia            1991  18443
+#>  6 Sarcopterygii       1991     13
+#>  7 <NA>                1991    912
+#>  8 Leptocardii         1991     36
+#>  9 Actinopterygii      1991 363791
+#> 10 Holocephali         1991   1048
 #> # … with more rows
 ```
 
@@ -145,28 +198,21 @@ resulting table to something much smaller, which can then be pulled into
 memory in R for further analysis using `collect()`:
 
 ``` r
-all_phyla <- collect(phyla)
-```
-
-We can now pass this table to other R functions, e.g. to plot our
-results:
-
-``` r
 library(tidyverse)
+growth <- collect(growth)
 
-top_phyla <- all_phyla %>%  pull(phylum) %>% unique() %>% head()
-top_countries <- all_phyla %>%  pull(countrycode) %>% unique() %>% head()
+fct_lump_n(growth$class, 6)%>%levels()
+#>  [1] "Actinopterygii"     "Amphibia"           "Ascidiacea"        
+#>  [4] "Aves"               "Cephalaspidomorphi" "Elasmobranchii"    
+#>  [7] "Holocephali"        "Mammalia"           "Myxini"            
+#> [10] "Reptilia"           "Thaliacea"          "Other"
+top_classes <- growth %>% pull(class) %>% unique() %>% head()
 
-phyla_other <- all_phyla %>% 
-  replace_na(list(phylum="Other", countrycode="Other")) %>%
-  mutate(phylum = fct_other(phylum, keep = top_phyla),
-         countrycode = fct_other(countrycode, keep = top_countries)) %>%
-  group_by(phylum, countrycode)  %>% 
-  summarise(n = sum(n))
-
-phyla_other %>% 
-  ggplot(aes(x = countrycode, y = n, fill = phylum)) + 
-  geom_col()
+# GBIF: the global bird information facility?
+growth %>% 
+  mutate(class = fct_lump_n(class, 6)) %>%
+  ggplot(aes(year, n, fill=class)) + geom_col() +
+  ggtitle("GBIF observations by class")
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
