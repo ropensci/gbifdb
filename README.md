@@ -148,16 +148,24 @@ memory in R for further analysis using `collect()`:
 all_phyla <- collect(phyla)
 ```
 
+We can now pass this table to other R functions, e.g. to plot our
+results:
+
 ``` r
-library(ggplot2)
-top_6 <-  head(all_phyla, 6)
-other <-  tail(all_phyla, -6) %>% 
-  summarise(n = sum(n)) %>%
-  mutate(phylum = "Other")
+library(tidyverse)
 
+top_phyla <- all_phyla %>%  pull(phylum) %>% unique() %>% head()
+top_countries <- all_phyla %>%  pull(countrycode) %>% unique() %>% head()
 
-bind_rows(top_6,other) %>% 
-  ggplot(aes(x = "taxa", y = n, fill = phylum)) + 
+phyla_other <- all_phyla %>% 
+  replace_na(list(phylum="Other", countrycode="Other")) %>%
+  mutate(phylum = fct_other(phylum, keep = top_phyla),
+         countrycode = fct_other(countrycode, keep = top_countries)) %>%
+  group_by(phylum, countrycode)  %>% 
+  summarise(n = sum(n))
+
+phyla_other %>% 
+  ggplot(aes(x = countrycode, y = n, fill = phylum)) + 
   geom_col()
 ```
 
