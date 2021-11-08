@@ -13,14 +13,14 @@ knitr::opts_chunk$set(
 )
 
 
-Sys.setenv("GBIFDB_HOME"=tempdir())
-Sys.setenv("GBIFDB_DB"=tempdir())
+Sys.setenv("GBIF_HOME"="/minio/shared-data/occurrence.parquet")
 
 ```
 
 # gbifdb
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/cboettig/gbifdb/workflows/R-CMD-check/badge.svg)](https://github.com/cboettig/gbifdb/actions)
 <!-- badges: end -->
 
 The goal of `gbifdb` is to provide a relational database interface to a `parquet` based serializations of `gbif` data. 
@@ -41,12 +41,15 @@ Unlike the `arrow` R packae interface, which can also query `parquet` files, `du
 install.packages("https://github.com/duckdb/duckdb/releases/download/master-builds/duckdb_r_src.tar.gz", repos = NULL)
 ```
 
+<!--
 
 You can install the released version of `gbifdb` from [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
 install.packages("gbifdb")
 ```
+
+-->
 
 And the development version from [GitHub](https://github.com/) with:
 
@@ -76,33 +79,47 @@ gbif_download(dir = gbif_dir())
 Simply point `gbif_conn()` at the directory containing your parquet files to initialize a connection.
 
 ```{r}
-import_ebird(tar)
+conn <- gbif_conn()
 ```
 
 
-Once the data have been downloaded and imported successfully, a user can access the full ebird record quite quickly:
+The resulting connection can be used with `dplyr::tbl()` to access the full gbif data:
 
 ```{r}  
-df <- ebird()
-df
+gbif <- tbl(conn, "gbif")
+gbif
 ```
 
 Now, we can use `dplyr` to perform standard queries:
 
 ```{r}
-colnames(df)
+phyla <- count(gbif, phylum, countrycode, sort = TRUE)
+phyla
+```
+
+Recall that when using remote data sources in `dplyr`, the data remains in the database (i.e. on disk, not in working RAM).  This is fine for any further operations using `dplyr`/`tidyr` functions which can be translated into SQL.  Using such functions we can usually reduce our resulting table to something much smaller, which can then be pulled into memory in R for further analysis using `collect()`:
+
+```{r}
+all_phyla <- collect(phyla)
 ```
 
 ```{r}
-df %>% count(`SCIENTIFIC NAME`, sort=TRUE)
+library(ggplot2)
+top_6 <-  head(all_phyla, 6)
+other <-  tail(all_phyla, -6) %>% 
+  summarise(n = sum(n)) %>%
+  mutate(phylum = "Other")
+
+
+bind_rows(top_6,other) %>% 
+  ggplot(aes(x = "taxa", y = n, fill = phylum)) + 
+  geom_col()
 ```
 
 
 
 ```{r include=FALSE}
-Sys.unsetenv("GBIFDB_HOME")
-Sys.unsetenv("GBIFDB_DB")
-
+Sys.unsetenv("GBIF_HOME")
 ```
 
 
