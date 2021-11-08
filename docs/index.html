@@ -57,6 +57,18 @@
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/intro.html">Intro to gbifdb</a>
+    </li>
+  </ul>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -109,11 +121,10 @@ install.packages("gbifdb")
 <a href="#getting-started" class="anchor"></a>Getting Started</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cboettig/gbifdb">gbifdb</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>  <span class="co"># optional, for dplyr-based operations</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cloudyr/aws.s3">aws.s3</a></span><span class="op">)</span> <span class="co"># optional, for S3-based sync</span></code></pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>  <span class="co"># optional, for dplyr-based operations</span></code></pre></div>
 <p>Before you can use <code>gbifdb</code> you will need to download GBIF data. Alternatively, many users may choose to launch an RStudio-server instance on a cloud platform that already has a local copy of the GBIF data available.</p>
 <p>Data can be downloaded by registering at GBIF portal, or directly from various cloud provider copies, including the AWS GBIF public data catalog, <a href="https://registry.opendata.aws/gbif/" class="uri">https://registry.opendata.aws/gbif/</a>, or the Microsoft Cloud, <a href="https://planetarycomputer.microsoft.com/dataset/gbif" class="uri">https://planetarycomputer.microsoft.com/dataset/gbif</a>, which include directions for direct download or syncing through various client software.</p>
-<p>Once you have downloaded the parquet-formatted GBIF data, simply point <code><a href="reference/gbif_conn.html">gbif_conn()</a></code> at the directory containing your parquet files to initialize a connection.</p>
+<p>Once you have downloaded the parquet-formatted GBIF data, simply point <code><a href="reference/gbif_conn.html">gbif_conn()</a></code> at the directory containing your parquet files to initialize a connection. (By default, <code><a href="reference/gbif_conn.html">gbif_conn()</a></code> will look for data in the configurable directory given by <code><a href="reference/gbif_dir.html">gbif_dir()</a></code>).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gbif_conn.html">gbif_conn</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>The resulting connection can be used with <code><a href="https://dplyr.tidyverse.org/reference/tbl.html">dplyr::tbl()</a></code> to access the full gbif data:</p>
@@ -165,17 +176,23 @@ install.packages("gbifdb")
 <p>Recall that when using remote data sources in <code>dplyr</code>, the data remains in the database (i.e. on disk, not in working RAM). This is fine for any further operations using <code>dplyr</code>/<code>tidyr</code> functions which can be translated into SQL. Using such functions we can usually reduce our resulting table to something much smaller, which can then be pulled into memory in R for further analysis using <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">all_phyla</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="va">phyla</span><span class="op">)</span></code></pre></div>
+<p>We can now pass this table to other R functions, e.g. to plot our results:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
-<span class="va">top_6</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">all_phyla</span>, <span class="fl">6</span><span class="op">)</span>
-<span class="va">other</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="va">all_phyla</span>, <span class="op">-</span><span class="fl">6</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>phylum <span class="op">=</span> <span class="st">"Other"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span>
 
+<span class="va">top_phyla</span> <span class="op">&lt;-</span> <span class="va">all_phyla</span> <span class="op">%&gt;%</span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">phylum</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">top_countries</span> <span class="op">&lt;-</span> <span class="va">all_phyla</span> <span class="op">%&gt;%</span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html">pull</a></span><span class="op">(</span><span class="va">countrycode</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 
-<span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind.html">bind_rows</a></span><span class="op">(</span><span class="va">top_6</span>,<span class="va">other</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"taxa"</span>, y <span class="op">=</span> <span class="va">n</span>, fill <span class="op">=</span> <span class="va">phylum</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<span class="va">phyla_other</span> <span class="op">&lt;-</span> <span class="va">all_phyla</span> <span class="op">%&gt;%</span> 
+  <span class="fu">replace_na</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>phylum<span class="op">=</span><span class="st">"Other"</span>, countrycode<span class="op">=</span><span class="st">"Other"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>phylum <span class="op">=</span> <span class="fu">fct_other</span><span class="op">(</span><span class="va">phylum</span>, keep <span class="op">=</span> <span class="va">top_phyla</span><span class="op">)</span>,
+         countrycode <span class="op">=</span> <span class="fu">fct_other</span><span class="op">(</span><span class="va">countrycode</span>, keep <span class="op">=</span> <span class="va">top_countries</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">phylum</span>, <span class="va">countrycode</span><span class="op">)</span>  <span class="op">%&gt;%</span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">phyla_other</span> <span class="op">%&gt;%</span> 
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">countrycode</span>, y <span class="op">=</span> <span class="va">n</span>, fill <span class="op">=</span> <span class="va">phylum</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_col</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
 </div>
 </div>
@@ -197,6 +214,12 @@ install.packages("gbifdb")
 <li>
 <a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
 </li>
+</ul>
+</div>
+<div class="community">
+<h2>Community</h2>
+<ul class="list-unstyled">
+<li><a href="CODE_OF_CONDUCT.html">Code of conduct</a></li>
 </ul>
 </div>
 <div class="developers">
