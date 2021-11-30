@@ -12,7 +12,7 @@ Description: A high performance interface to the Global Biodiversity
   of the 'GBIF' data in 'parquet' format, which is already readily
   available in commercial computing clouds such as the Amazon Open
   Data portal and the Microsoft Planetary Computer, or can be 
-  accessed directly or downloaded
+  accessed directly without downloading, or downloaded
   to any server with suitable bandwidth and storage space.
 Authors@R: c(
             person("Carl", "Boettiger", , "cboettig@gmail.com", c("aut", "cre"),
@@ -23,6 +23,7 @@ Encoding: UTF-8
 ByteCompile: true
 Depends: R (>= 4.0)
 Imports:
+    arrow (>= 6.0.1),
     duckdb (>= 0.2.9),
     DBI
 Suggests:
@@ -33,8 +34,7 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    aws.s3,
-    arrow
+    aws.s3
 URL: https://github.com/cboettig/gbifdb
 BugReports: https://github.com/cboettig/gbifdb
 Language: en-US
