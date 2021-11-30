@@ -157,14 +157,11 @@ Using such functions we can usually reduce our resulting table to something much
 which can then be pulled into memory in R for further analysis using `collect()`:
 
 ```{r}
-library(tidyverse)
-growth <- collect(growth)
-
-fct_lump_n(growth$class, 6) %>% levels()
-top_classes <- growth %>% pull(class) %>% unique() %>% head()
-
+library(ggplot2)
+library(forcats)
 # GBIF: the global bird information facility?
-growth %>% 
+growth %>%
+ collect() %>%
   mutate(class = fct_lump_n(class, 6)) %>%
   ggplot(aes(year, n, fill=class)) + geom_col() +
   ggtitle("GBIF observations by class")

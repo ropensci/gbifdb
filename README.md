@@ -212,15 +212,15 @@ growth
 #>    class               year       n
 #>    <chr>              <int>   <dbl>
 #>  1 Aves                1991 3183184
-#>  2 Mammalia            1991  100931
-#>  3 Amphibia            1991   18443
-#>  4 Cephalaspidomorphi  1991    1152
-#>  5 Reptilia            1991   29806
-#>  6 Actinopterygii      1991  363791
+#>  2 Reptilia            1991   29806
+#>  3 Mammalia            1991  100931
+#>  4 Amphibia            1991   18443
+#>  5 Actinopterygii      1991  363791
+#>  6 Cephalaspidomorphi  1991    1152
 #>  7 Ascidiacea          1991    1602
-#>  8 <NA>                1991     912
+#>  8 Myxini              1991     134
 #>  9 Elasmobranchii      1991   17521
-#> 10 Holocephali         1991    1048
+#> 10 <NA>                1991     912
 #> # … with more rows
 ```
 
@@ -233,18 +233,11 @@ something much smaller, which can then be pulled into memory in R for
 further analysis using `collect()`:
 
 ``` r
-library(tidyverse)
-growth <- collect(growth)
-
-fct_lump_n(growth$class, 6) %>% levels()
-#>  [1] "Actinopterygii"     "Amphibia"           "Ascidiacea"        
-#>  [4] "Aves"               "Cephalaspidomorphi" "Elasmobranchii"    
-#>  [7] "Holocephali"        "Mammalia"           "Myxini"            
-#> [10] "Reptilia"           "Thaliacea"          "Other"
-top_classes <- growth %>% pull(class) %>% unique() %>% head()
-
+library(ggplot2)
+library(forcats)
 # GBIF: the global bird information facility?
-growth %>% 
+growth %>%
+ collect() %>%
   mutate(class = fct_lump_n(class, 6)) %>%
   ggplot(aes(year, n, fill=class)) + geom_col() +
   ggtitle("GBIF observations by class")
