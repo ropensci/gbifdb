@@ -31,8 +31,15 @@ Users already familiar with SQL can construct SQL queries directly with `DBI` in
 `gbifdb` sends these queries to [`duckdb`](https://duckdb.org), a high-performance, columnar-oriented database engine which runs entirely inside the client,
 (unlike server-client databases such as MySQL or Postgres, no additional setup is needed outside of installing `gbifdb`.)
 `duckdb` is able to execute these SQL queries directly on-disk against the Parquet data files, side-stepping limitations of available RAM or the need to import the data. 
-It's highly optimized implementation can be faster even than in-memory operations in `dplyr`, especially when using fast SSD-based storage disks.
-Unlike the `arrow` R packae interface, which can also query `parquet` files, `duckdb` supports the full set of SQL instructions, including windowed operations like `group_by`+`summarise` as well as table joins.
+It's highly optimized implementation can be faster even than in-memory operations in `dplyr`.
+`duckdb` supports the full set of SQL instructions, including windowed operations like `group_by`+`summarise` as well as table joins.
+
+`gbifdb` has two mechanisms for providing database connections: one which the Parquet snapshot of GBIF must first be downloaded locally, 
+and a second where the GBIF parquet snapshot can be accessed directly from an Amazon Public Data Registry S3 bucket without downloading a copy.
+The latter approach will be faster for one-off operations and is also suitable when using a cloud-based computing provider in the same region.
+
+
+
 
 
 ## Installation
@@ -69,15 +76,51 @@ library(gbifdb)
 library(dplyr)  # optional, for dplyr-based operations
 ```
 
-Before you can use `gbifdb` you will need to download GBIF data.
-Alternatively, many users may choose to launch an RStudio-server instance on a cloud platform that already has a local copy of the GBIF data available. 
+### Remote data access
 
-Data can be downloaded by registering at GBIF portal, or directly from various cloud provider copies, including the AWS GBIF public data catalog,
-<https://registry.opendata.aws/gbif/>, or the Microsoft Cloud,
-<https://planetarycomputer.microsoft.com/dataset/gbif>,
-which include directions for direct download or syncing through various client software.
+To begin working with GBIF data directly without downloading the data first, simply establish a remote connection using `gbif_remote()`.
 
+```{r}
+gbif <- gbif_remote()
+```
 
+We can now perform most `dplyr` operations:
+
+```{r}
+gbif %>%
+  filter(phylum == "Chordata", year > 1990) %>%
+  count(class, year)
+```
+
+By default, this relies on an `arrow` connection, which currently lacks support for some more complex windowed operations in `dplyr`.
+A user can specify the option `to_duckdb = TRUE` in `gbif_remote()` (or simply pass the connection to `arrow::to_duckdb()`) to create
+a `duckdb` connection. This is slightly slower at this time. 
+Keep in mind that as with any database connection, to use non-`dplyr` functions the user will generally need to call `dplyr::collect()`,
+which pulls the data into working memory.  
+Be sure to subset the data appropriately first (e.g. with `filter`, `summarise`, etc), as attempting to `collect()` a large
+table will probably exceed available RAM and crash your R session!
+
+When using a `gbif_remote()` connection, 
+all I/O operations will be conducted over the network storage instead of your local disk,
+without downloading the full dataset first.
+These operations will be considerably slower than they would be if you download the entire dataset first 
+(see below, unless you are on an AWS cloud instance in the same region as the remote host), but this does
+avoid the download step all-together, which may be necessary if you do not have 100+ GB free storage space
+or the time to download the whole dataset first (e.g. for one-off queries).
+
+### Local data
+
+For extended analysis of GBIF, users may prefer to download the entire GBIF parquet data first.
+This requires over 100 GB free disk space, and will be a time-consuming process the first time.
+However, once downloaded, future queries will run much much faster, particularly if you are network-limited.
+Users can download the current release of GBIF to local storage like so:
+
+```r
+gbif_download()
+```
+
+By default, this will download to the dir given by `gbif_dir()`.  
+An alternative directory can be set as an argument, or by setting the path in the environmental variable, `GBIF_HOME`.
 
 Once you have downloaded the parquet-formatted GBIF data, 
 simply point `gbif_conn()` at the directory containing your parquet files to initialize a connection.
@@ -100,15 +143,6 @@ colnames(gbif)
 ```
 
 Now, we can use `dplyr` to perform standard queries: 
-for instance, the number of unique species observed by country:
-
-
-```{r}
-gbif %>% select(species, countrycode) %>%
-  distinct() %>% 
-  count(countrycode)
-```
-
 
 ```{r}
 growth <- gbif %>% 
@@ -117,13 +151,16 @@ growth <- gbif %>%
 growth
 ```
 
-Recall that when using remote data sources in `dplyr`, the data remains in the database (i.e. on disk, not in working RAM).  This is fine for any further operations using `dplyr`/`tidyr` functions which can be translated into SQL.  Using such functions we can usually reduce our resulting table to something much smaller, which can then be pulled into memory in R for further analysis using `collect()`:
+Recall that when database connections in `dplyr`, the data remains in the database (i.e. on disk, not in working RAM).  
+This is fine for any further operations using `dplyr`/`tidyr` functions which can be translated into SQL.  
+Using such functions we can usually reduce our resulting table to something much smaller, 
+which can then be pulled into memory in R for further analysis using `collect()`:
 
 ```{r}
 library(tidyverse)
 growth <- collect(growth)
 
-fct_lump_n(growth$class, 6)%>%levels()
+fct_lump_n(growth$class, 6) %>% levels()
 top_classes <- growth %>% pull(class) %>% unique() %>% head()
 
 # GBIF: the global bird information facility?

@@ -22,11 +22,16 @@ setup is needed outside of installing `gbifdb`.) `duckdb` is able to
 execute these SQL queries directly on-disk against the Parquet data
 files, side-stepping limitations of available RAM or the need to import
 the data. It’s highly optimized implementation can be faster even than
-in-memory operations in `dplyr`, especially when using fast SSD-based
-storage disks. Unlike the `arrow` R packae interface, which can also
-query `parquet` files, `duckdb` supports the full set of SQL
+in-memory operations in `dplyr`. `duckdb` supports the full set of SQL
 instructions, including windowed operations like `group_by`+`summarise`
 as well as table joins.
+
+`gbifdb` has two mechanisms for providing database connections: one
+which the Parquet snapshot of GBIF must first be downloaded locally, and
+a second where the GBIF parquet snapshot can be accessed directly from
+an Amazon Public Data Registry S3 bucket without downloading a copy. The
+latter approach will be faster for one-off operations and is also
+suitable when using a cloud-based computing provider in the same region.
 
 ## Installation
 
@@ -63,17 +68,68 @@ library(gbifdb)
 library(dplyr)  # optional, for dplyr-based operations
 ```
 
-Before you can use `gbifdb` you will need to download GBIF data.
-Alternatively, many users may choose to launch an RStudio-server
-instance on a cloud platform that already has a local copy of the GBIF
-data available.
+### Remote data access
 
-Data can be downloaded by registering at GBIF portal, or directly from
-various cloud provider copies, including the AWS GBIF public data
-catalog, <https://registry.opendata.aws/gbif/>, or the Microsoft Cloud,
-<https://planetarycomputer.microsoft.com/dataset/gbif>, which include
-directions for direct download or syncing through various client
-software.
+To begin working with GBIF data directly without downloading the data
+first, simply establish a remote connection using `gbif_remote()`.
+
+``` r
+gbif <- gbif_remote()
+```
+
+We can now perform most `dplyr` operations:
+
+``` r
+gbif %>%
+  filter(phylum == "Chordata", year > 1990) %>%
+  count(class, year)
+#> FileSystemDataset (query)
+#> class: string
+#> year: int32
+#> n: int32
+#> 
+#> * Grouped by class
+#> See $.data for the source Arrow object
+```
+
+By default, this relies on an `arrow` connection, which currently lacks
+support for some more complex windowed operations in `dplyr`. A user can
+specify the option `to_duckdb = TRUE` in `gbif_remote()` (or simply pass
+the connection to `arrow::to_duckdb()`) to create a `duckdb` connection.
+This is slightly slower at this time. Keep in mind that as with any
+database connection, to use non-`dplyr` functions the user will
+generally need to call `dplyr::collect()`, which pulls the data into
+working memory.  
+Be sure to subset the data appropriately first (e.g. with `filter`,
+`summarise`, etc), as attempting to `collect()` a large table will
+probably exceed available RAM and crash your R session\!
+
+When using a `gbif_remote()` connection, all I/O operations will be
+conducted over the network storage instead of your local disk, without
+downloading the full dataset first. These operations will be
+considerably slower than they would be if you download the entire
+dataset first (see below, unless you are on an AWS cloud instance in the
+same region as the remote host), but this does avoid the download step
+all-together, which may be necessary if you do not have 100+ GB free
+storage space or the time to download the whole dataset first (e.g. for
+one-off queries).
+
+### Local data
+
+For extended analysis of GBIF, users may prefer to download the entire
+GBIF parquet data first. This requires over 100 GB free disk space, and
+will be a time-consuming process the first time. However, once
+downloaded, future queries will run much much faster, particularly if
+you are network-limited. Users can download the current release of GBIF
+to local storage like so:
+
+``` r
+gbif_download()
+```
+
+By default, this will download to the dir given by `gbif_dir()`.  
+An alternative directory can be set as an argument, or by setting the
+path in the environmental variable, `GBIF_HOME`.
 
 Once you have downloaded the parquet-formatted GBIF data, simply point
 `gbif_conn()` at the directory containing your parquet files to
@@ -94,16 +150,16 @@ gbif
 #> # Database: duckdb_connection
 #>        gbifid datasetkey  occurrenceid   kingdom phylum class order family genus
 #>         <dbl> <chr>       <chr>          <chr>   <chr>  <chr> <chr> <chr>  <chr>
-#>  1 1572326202 0e2c20a3-3… 7B3E9B63FF90F… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  2 1572326211 0e2c20a3-3… 7B3E9B63FF8BF… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  3 1572326213 0e2c20a3-3… 7B3E9B63FF96F… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  4 1572326222 0e2c20a3-3… 7B3E9B63FF8EF… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  5 1572326224 0e2c20a3-3… 7B3E9B63FF8FF… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  6 1572326210 0e2c20a3-3… 7B3E9B63FF92F… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  7 1572326209 0e2c20a3-3… 7B3E9B63FF8BF… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  8 1572326215 0e2c20a3-3… 7B3E9B63FF8FF… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#>  9 1572326228 0e2c20a3-3… 7B3E9B63FF8EF… Animal… Arthr… <NA>  Aran… Capon… Medi…
-#> 10 1572326205 0e2c20a3-3… 7B3E9B63FF8BF… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  1 1851456555 b234abf6-4… 03871B11FFA43… Animal… Echin… Holo… Dend… Cucum… Acti…
+#>  2 1851456618 b234abf6-4… 03871B11FFAA3… Animal… Echin… Holo… Dend… Scler… Clad…
+#>  3 1851456554 b234abf6-4… 03871B11FFA53… Animal… Echin… Holo… Dend… Cucum… Acti…
+#>  4 1851456620 b234abf6-4… 03871B11FFA03… Animal… Echin… Holo… Dend… Phyll… Tria…
+#>  5 1851456556 b234abf6-4… 03871B11FFA83… Animal… Echin… Holo… Dend… Scler… Glob…
+#>  6 1851456619 b234abf6-4… 03871B11FFA33… Animal… Echin… Holo… Dend… Phyll… Mass…
+#>  7 1851456623 b234abf6-4… 03871B11FFA03… Animal… Echin… Holo… Dend… Phyll… Tria…
+#>  8 1851456714 b234abf6-4… 03871B11FFAC3… Animal… Echin… Holo… Dend… Phyll… Mass…
+#>  9 1851456553 b234abf6-4… 03871B11FFAA3… Animal… Echin… Holo… Dend… Scler… Clad…
+#> 10 1851456622 b234abf6-4… 03871B11FFA53… Animal… Echin… Holo… Dend… Cucum… Acti…
 #> # … with more rows, and 41 more variables: species <chr>,
 #> #   infraspecificepithet <chr>, taxonrank <chr>, scientificname <chr>,
 #> #   verbatimscientificname <chr>, verbatimscientificnameauthorship <chr>,
@@ -142,29 +198,7 @@ colnames(gbif)
 #> [49] "mediatype"                        "issue"
 ```
 
-Now, we can use `dplyr` to perform standard queries: for instance, the
-number of unique species observed by country:
-
-``` r
-gbif %>% select(species, countrycode) %>%
-  distinct() %>% 
-  count(countrycode)
-#> # Source:   lazy query [?? x 2]
-#> # Database: duckdb_connection
-#>    countrycode      n
-#>    <chr>        <dbl>
-#>  1 US          185986
-#>  2 GB           45065
-#>  3 HN           12430
-#>  4 ES           33794
-#>  5 BZ            9912
-#>  6 CR           44425
-#>  7 AU          122412
-#>  8 FI           24912
-#>  9 AR           28761
-#> 10 CO           42958
-#> # … with more rows
-```
+Now, we can use `dplyr` to perform standard queries:
 
 ``` r
 growth <- gbif %>% 
@@ -175,33 +209,34 @@ growth
 #> # Database:   duckdb_connection
 #> # Groups:     class
 #> # Ordered by: year
-#>    class               year      n
-#>    <chr>              <int>  <dbl>
-#>  1 Cephalaspidomorphi  1991   1152
-#>  2 Elasmobranchii      1991  17521
-#>  3 Ascidiacea          1991   1602
-#>  4 Thaliacea           1991    669
-#>  5 Amphibia            1991  18443
-#>  6 Sarcopterygii       1991     13
-#>  7 <NA>                1991    912
-#>  8 Leptocardii         1991     36
-#>  9 Actinopterygii      1991 363791
-#> 10 Holocephali         1991   1048
+#>    class               year       n
+#>    <chr>              <int>   <dbl>
+#>  1 Aves                1991 3183184
+#>  2 Mammalia            1991  100931
+#>  3 Amphibia            1991   18443
+#>  4 Cephalaspidomorphi  1991    1152
+#>  5 Reptilia            1991   29806
+#>  6 Actinopterygii      1991  363791
+#>  7 Ascidiacea          1991    1602
+#>  8 <NA>                1991     912
+#>  9 Elasmobranchii      1991   17521
+#> 10 Holocephali         1991    1048
 #> # … with more rows
 ```
 
-Recall that when using remote data sources in `dplyr`, the data remains
-in the database (i.e. on disk, not in working RAM). This is fine for any
-further operations using `dplyr`/`tidyr` functions which can be
-translated into SQL. Using such functions we can usually reduce our
-resulting table to something much smaller, which can then be pulled into
-memory in R for further analysis using `collect()`:
+Recall that when database connections in `dplyr`, the data remains in
+the database (i.e. on disk, not in working RAM).  
+This is fine for any further operations using `dplyr`/`tidyr` functions
+which can be translated into SQL.  
+Using such functions we can usually reduce our resulting table to
+something much smaller, which can then be pulled into memory in R for
+further analysis using `collect()`:
 
 ``` r
 library(tidyverse)
 growth <- collect(growth)
 
-fct_lump_n(growth$class, 6)%>%levels()
+fct_lump_n(growth$class, 6) %>% levels()
 #>  [1] "Actinopterygii"     "Amphibia"           "Ascidiacea"        
 #>  [4] "Aves"               "Cephalaspidomorphi" "Elasmobranchii"    
 #>  [7] "Holocephali"        "Mammalia"           "Myxini"            
@@ -215,4 +250,4 @@ growth %>%
   ggtitle("GBIF observations by class")
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
