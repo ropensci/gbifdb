@@ -4,7 +4,7 @@
 \alias{gbif_download}
 \title{Download GBIF data using aws.s3 sync}
 \usage{
-gbif_download(version = "occurrence/2021-11-01", dir = gbif_dir())
+gbif_download(version = "2021-11-01", dir = gbif_dir())
 }
 \arguments{
 \item{version}{'prefix' string (folder) from the

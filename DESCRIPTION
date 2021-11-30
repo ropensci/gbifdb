@@ -32,7 +32,8 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    aws.s3
+    aws.s3,
+    arrow
 URL: https://github.com/cboettig/gbifdb
 BugReports: https://github.com/cboettig/gbifdb
 Language: en-US

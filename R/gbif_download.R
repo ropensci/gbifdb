@@ -20,7 +20,7 @@
 #' gbif_download()
 #' 
 gbif_download <-
-  function(version = "occurrence/2021-11-01",
+  function(version = "2021-11-01",
            dir = gbif_dir()
            ){
 
@@ -35,7 +35,7 @@ gbif_download <-
   aws.s3::s3sync(dir,
                  base_url = "s3.amazonaws.com",
                  bucket = "gbif-open-data-ap-southeast-2",
-                 prefix = version,
+                 prefix = paste0("occurrence/", version),
                  region = "ap-southeast-2")
 }
 
