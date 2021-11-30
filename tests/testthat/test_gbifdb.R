@@ -8,7 +8,8 @@ test_that("gbif_example_data()", {
 })
 
 test_that("gbif_conn()", {
-
+  
+  skip_on_os("solaris")
   path <- gbif_example_data()
   conn <- gbif_conn(path)
 
@@ -18,6 +19,8 @@ test_that("gbif_conn()", {
 })
 
 test_that("gbif_remote()", {
+  skip_on_cran()
+  skip_if_offline()
   conn <- gbif_remote(to_duckdb = FALSE)
   expect_true(inherits(conn, "Dataset"))
 })
