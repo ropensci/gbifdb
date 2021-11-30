@@ -76,7 +76,7 @@
 
       
 
-      </header><script src="intro_files/header-attrs-2.11/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Intro to gbifdb</h1>
@@ -89,39 +89,86 @@
 
     
     
-<p>The goal of <code>gbifdb</code> is to provide a relational database interface to a <code>parquet</code> based serializations of <code>gbif</code> data. Instead of requiring custom functions for filtering and selecting data from the central GBIF server (as in <code>rgbif</code>), <code>gbifdb</code> users can take advantage of the full array of <code>dplyr</code> and <code>tidyr</code> functions which can be automatically translated to SQL by <code>dbplyr</code>. Users already familiar with SQL can construct SQL queries directly with <code>DBI</code> instead. <code>gbifdb</code> sends these queries to <a href="https://duckdb.org"><code>duckdb</code></a>, a high-performance, columnar-oriented database engine which runs entirely inside the client, (unlike server-client databases such as MySQL or Postgres, no additional setup is needed outside of installing <code>gbifdb</code>.) <code>duckdb</code> is able to execute these SQL queries directly on-disk against the Parquet data files, side-stepping limitations of available RAM or the need to import the data. It’s highly optimized implementation can be faster even than in-memory operations in <code>dplyr</code>, especially when using fast SSD-based storage disks. Unlike the <code>arrow</code> R packae interface, which can also query <code>parquet</code> files, <code>duckdb</code> supports the full set of SQL instructions, including windowed operations like <code>group_by</code>+<code>summarise</code> as well as table joins.</p>
+<p>The goal of <code>gbifdb</code> is to provide a relational database interface to a <code>parquet</code> based serializations of <code>gbif</code> data. Instead of requiring custom functions for filtering and selecting data from the central GBIF server (as in <code>rgbif</code>), <code>gbifdb</code> users can take advantage of the full array of <code>dplyr</code> and <code>tidyr</code> functions which can be automatically translated to SQL by <code>dbplyr</code>. Users already familiar with SQL can construct SQL queries directly with <code>DBI</code> instead. <code>gbifdb</code> sends these queries to <a href="https://duckdb.org"><code>duckdb</code></a>, a high-performance, columnar-oriented database engine which runs entirely inside the client, (unlike server-client databases such as MySQL or Postgres, no additional setup is needed outside of installing <code>gbifdb</code>.) <code>duckdb</code> is able to execute these SQL queries directly on-disk against the Parquet data files, side-stepping limitations of available RAM or the need to import the data. It’s highly optimized implementation can be faster even than in-memory operations in <code>dplyr</code>. <code>duckdb</code> supports the full set of SQL instructions, including windowed operations like <code>group_by</code>+<code>summarise</code> as well as table joins.</p>
+<p><code>gbifdb</code> has two mechanisms for providing database connections: one which the Parquet snapshot of GBIF must first be downloaded locally, and a second where the GBIF parquet snapshot can be accessed directly from an Amazon Public Data Registry S3 bucket without downloading a copy. The latter approach will be faster for one-off operations and is also suitable when using a cloud-based computing provider in the same region.</p>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p><strong>NOTE</strong>: <code>gbifdb</code> currently requires the dev version of <code>duckdb</code>, which you can install using:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"https://github.com/duckdb/duckdb/releases/download/master-builds/duckdb_r_src.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+<!--
+
+You can install the released version of `gbifdb` from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("gbifdb")
+```
+
+-->
+<p>And the development version from <a href="https://github.com/">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">"cboettig/gbifdb"</span><span class="op">)</span></code></pre></div>
 <p><code>gbifdb</code> has few dependencies: only <code>duckdb</code> and <code>DBI</code> are required.</p>
+</div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting Started</h2>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/cboettig/gbifdb">gbifdb</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>  <span class="co"># optional, for dplyr-based operations</span></code></pre></div>
-<p>Before you can use <code>gbifdb</code> you will need to download GBIF data. Alternatively, many users may choose to launch an RStudio-server instance on a cloud platform that already has a local copy of the GBIF data available.</p>
-<p>Data can be downloaded by registering at GBIF portal, or directly from various cloud provider copies, including the AWS GBIF public data catalog, <a href="https://registry.opendata.aws/gbif/" class="uri">https://registry.opendata.aws/gbif/</a>, or the Microsoft Cloud, <a href="https://planetarycomputer.microsoft.com/dataset/gbif" class="uri">https://planetarycomputer.microsoft.com/dataset/gbif</a>, which include directions for direct download or syncing through various client software.</p>
-<p>Once you have downloaded the parquet-formatted GBIF data, simply point <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> at the directory containing your parquet files to initialize a connection.</p>
-<p>By default, <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> will look for data in the configurable directory given by <code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>. For illustrative purposes only, we can use the small example data containing the frist 1000 rows of the GBIF occurrence table.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gbif_example_data.html">gbif_example_data</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gbif_conn.html">gbif_conn</a></span><span class="op">(</span><span class="va">dir</span><span class="op">)</span></code></pre></div>
+<div id="remote-data-access" class="section level3">
+<h3 class="hasAnchor">
+<a href="#remote-data-access" class="anchor"></a>Remote data access</h3>
+<p>To begin working with GBIF data directly without downloading the data first, simply establish a remote connection using <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbif</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gbif_remote.html">gbif_remote</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>We can now perform most <code>dplyr</code> operations:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">gbif</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">phylum</span> <span class="op">==</span> <span class="st">"Chordata"</span>, <span class="va">year</span> <span class="op">&gt;</span> <span class="fl">1990</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">class</span>, <span class="va">year</span><span class="op">)</span>
+<span class="co">#&gt; FileSystemDataset (query)</span>
+<span class="co">#&gt; class: string</span>
+<span class="co">#&gt; year: int32</span>
+<span class="co">#&gt; n: int32</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; * Grouped by class</span>
+<span class="co">#&gt; See $.data for the source Arrow object</span></code></pre></div>
+<p>By default, this relies on an <code>arrow</code> connection, which currently lacks support for some more complex windowed operations in <code>dplyr</code>. A user can specify the option <code>to_duckdb = TRUE</code> in <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code> (or simply pass the connection to <code><a href="https://arrow.apache.org/docs/r//reference/to_duckdb.html">arrow::to_duckdb()</a></code>) to create a <code>duckdb</code> connection. This is slightly slower at this time. Keep in mind that as with any database connection, to use non-<code>dplyr</code> functions the user will generally need to call <code><a href="https://dplyr.tidyverse.org/reference/compute.html">dplyr::collect()</a></code>, which pulls the data into working memory.<br>
+Be sure to subset the data appropriately first (e.g. with <code>filter</code>, <code>summarise</code>, etc), as attempting to <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code> a large table will probably exceed available RAM and crash your R session!</p>
+<p>When using a <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code> connection, all I/O operations will be conducted over the network storage instead of your local disk, without downloading the full dataset first. These operations will be considerably slower than they would be if you download the entire dataset first (see below, unless you are on an AWS cloud instance in the same region as the remote host), but this does avoid the download step all-together, which may be necessary if you do not have 100+ GB free storage space or the time to download the whole dataset first (e.g. for one-off queries).</p>
+</div>
+<div id="local-data" class="section level3">
+<h3 class="hasAnchor">
+<a href="#local-data" class="anchor"></a>Local data</h3>
+<p>For extended analysis of GBIF, users may prefer to download the entire GBIF parquet data first. This requires over 100 GB free disk space, and will be a time-consuming process the first time. However, once downloaded, future queries will run much much faster, particularly if you are network-limited. Users can download the current release of GBIF to local storage like so:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/gbif_download.html">gbif_download</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<p>By default, this will download to the dir given by <code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>.<br>
+An alternative directory can be set as an argument, or by setting the path in the environmental variable, <code>GBIF_HOME</code>.</p>
+<p>Once you have downloaded the parquet-formatted GBIF data, simply point <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> at the directory containing your parquet files to initialize a connection. (By default, <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> will look for data in the configurable directory given by <code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>).</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gbif_conn.html">gbif_conn</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>The resulting connection can be used with <code><a href="https://dplyr.tidyverse.org/reference/tbl.html">dplyr::tbl()</a></code> to access the full gbif data:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gbif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">conn</span>, <span class="st">"gbif"</span><span class="op">)</span>
 <span class="va">gbif</span>
 <span class="co">#&gt; # Source:   table&lt;gbif&gt; [?? x 50]</span>
 <span class="co">#&gt; # Database: duckdb_connection</span>
 <span class="co">#&gt;        gbifid datasetkey  occurrenceid   kingdom phylum class order family genus</span>
 <span class="co">#&gt;         &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;</span>
-<span class="co">#&gt;  1 1572326202 0e2c20a3-3… 7B3E9B63FF90F… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  2 1572326211 0e2c20a3-3… 7B3E9B63FF8BF… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  3 1572326213 0e2c20a3-3… 7B3E9B63FF96F… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  4 1572326222 0e2c20a3-3… 7B3E9B63FF8EF… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  5 1572326224 0e2c20a3-3… 7B3E9B63FF8FF… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  6 1572326210 0e2c20a3-3… 7B3E9B63FF92F… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  7 1572326209 0e2c20a3-3… 7B3E9B63FF8BF… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  8 1572326215 0e2c20a3-3… 7B3E9B63FF8FF… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt;  9 1572326228 0e2c20a3-3… 7B3E9B63FF8EF… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
-<span class="co">#&gt; 10 1572326205 0e2c20a3-3… 7B3E9B63FF8BF… Animal… Arthr… &lt;NA&gt;  Aran… Capon… Medi…</span>
+<span class="co">#&gt;  1 1851456555 b234abf6-4… 03871B11FFA43… Animal… Echin… Holo… Dend… Cucum… Acti…</span>
+<span class="co">#&gt;  2 1851456618 b234abf6-4… 03871B11FFAA3… Animal… Echin… Holo… Dend… Scler… Clad…</span>
+<span class="co">#&gt;  3 1851456554 b234abf6-4… 03871B11FFA53… Animal… Echin… Holo… Dend… Cucum… Acti…</span>
+<span class="co">#&gt;  4 1851456620 b234abf6-4… 03871B11FFA03… Animal… Echin… Holo… Dend… Phyll… Tria…</span>
+<span class="co">#&gt;  5 1851456556 b234abf6-4… 03871B11FFA83… Animal… Echin… Holo… Dend… Scler… Glob…</span>
+<span class="co">#&gt;  6 1851456619 b234abf6-4… 03871B11FFA33… Animal… Echin… Holo… Dend… Phyll… Mass…</span>
+<span class="co">#&gt;  7 1851456623 b234abf6-4… 03871B11FFA03… Animal… Echin… Holo… Dend… Phyll… Tria…</span>
+<span class="co">#&gt;  8 1851456714 b234abf6-4… 03871B11FFAC3… Animal… Echin… Holo… Dend… Phyll… Mass…</span>
+<span class="co">#&gt;  9 1851456553 b234abf6-4… 03871B11FFAA3… Animal… Echin… Holo… Dend… Scler… Clad…</span>
+<span class="co">#&gt; 10 1851456622 b234abf6-4… 03871B11FFA53… Animal… Echin… Holo… Dend… Cucum… Acti…</span>
 <span class="co">#&gt; # … with more rows, and 41 more variables: species &lt;chr&gt;,</span>
 <span class="co">#&gt; #   infraspecificepithet &lt;chr&gt;, taxonrank &lt;chr&gt;, scientificname &lt;chr&gt;,</span>
 <span class="co">#&gt; #   verbatimscientificname &lt;chr&gt;, verbatimscientificnameauthorship &lt;chr&gt;,</span>
@@ -129,26 +176,71 @@
 <span class="co">#&gt; #   occurrencestatus &lt;chr&gt;, individualcount &lt;int&gt;, publishingorgkey &lt;chr&gt;,</span>
 <span class="co">#&gt; #   decimallatitude &lt;dbl&gt;, decimallongitude &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   coordinateuncertaintyinmeters &lt;dbl&gt;, coordinateprecision &lt;dbl&gt;, …</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">gbif</span><span class="op">)</span>
+<span class="co">#&gt;  [1] "gbifid"                           "datasetkey"                      </span>
+<span class="co">#&gt;  [3] "occurrenceid"                     "kingdom"                         </span>
+<span class="co">#&gt;  [5] "phylum"                           "class"                           </span>
+<span class="co">#&gt;  [7] "order"                            "family"                          </span>
+<span class="co">#&gt;  [9] "genus"                            "species"                         </span>
+<span class="co">#&gt; [11] "infraspecificepithet"             "taxonrank"                       </span>
+<span class="co">#&gt; [13] "scientificname"                   "verbatimscientificname"          </span>
+<span class="co">#&gt; [15] "verbatimscientificnameauthorship" "countrycode"                     </span>
+<span class="co">#&gt; [17] "locality"                         "stateprovince"                   </span>
+<span class="co">#&gt; [19] "occurrencestatus"                 "individualcount"                 </span>
+<span class="co">#&gt; [21] "publishingorgkey"                 "decimallatitude"                 </span>
+<span class="co">#&gt; [23] "decimallongitude"                 "coordinateuncertaintyinmeters"   </span>
+<span class="co">#&gt; [25] "coordinateprecision"              "elevation"                       </span>
+<span class="co">#&gt; [27] "elevationaccuracy"                "depth"                           </span>
+<span class="co">#&gt; [29] "depthaccuracy"                    "eventdate"                       </span>
+<span class="co">#&gt; [31] "day"                              "month"                           </span>
+<span class="co">#&gt; [33] "year"                             "taxonkey"                        </span>
+<span class="co">#&gt; [35] "specieskey"                       "basisofrecord"                   </span>
+<span class="co">#&gt; [37] "institutioncode"                  "collectioncode"                  </span>
+<span class="co">#&gt; [39] "catalognumber"                    "recordnumber"                    </span>
+<span class="co">#&gt; [41] "identifiedby"                     "dateidentified"                  </span>
+<span class="co">#&gt; [43] "license"                          "rightsholder"                    </span>
+<span class="co">#&gt; [45] "recordedby"                       "typestatus"                      </span>
+<span class="co">#&gt; [47] "establishmentmeans"               "lastinterpreted"                 </span>
+<span class="co">#&gt; [49] "mediatype"                        "issue"</span></code></pre></div>
 <p>Now, we can use <code>dplyr</code> to perform standard queries:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">phyla</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">gbif</span>, <span class="va">phylum</span>, <span class="va">countrycode</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">phyla</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">growth</span> <span class="op">&lt;-</span> <span class="va">gbif</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">phylum</span> <span class="op">==</span> <span class="st">"Chordata"</span>, <span class="va">year</span> <span class="op">&gt;</span> <span class="fl">1990</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html">count</a></span><span class="op">(</span><span class="va">class</span>, <span class="va">year</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span>
+<span class="va">growth</span>
 <span class="co">#&gt; # Source:     lazy query [?? x 3]</span>
 <span class="co">#&gt; # Database:   duckdb_connection</span>
-<span class="co">#&gt; # Groups:     phylum</span>
-<span class="co">#&gt; # Ordered by: desc(n)</span>
-<span class="co">#&gt;   phylum       countrycode     n</span>
-<span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 Tracheophyta RU            982</span>
-<span class="co">#&gt; 2 Arthropoda   BR             11</span>
-<span class="co">#&gt; 3 Arthropoda   VE              3</span>
-<span class="co">#&gt; 4 Arthropoda   EC              2</span>
-<span class="co">#&gt; 5 Arthropoda   TT              1</span>
-<span class="co">#&gt; 6 Arthropoda   CO              1</span></code></pre></div>
-<p>Recall that when using remote data sources in <code>dplyr</code>, the data remains in the database (i.e. on disk, not in working RAM). This is fine for any further operations using <code>dplyr</code>/<code>tidyr</code> functions which can be translated into SQL. Using such functions we can usually reduce our resulting table to something much smaller, which can then be pulled into memory in R for further analysis using <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">all_phyla</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="va">phyla</span><span class="op">)</span></code></pre></div>
-<p>We can now pass this table to other R functions.</p>
+<span class="co">#&gt; # Groups:     class</span>
+<span class="co">#&gt; # Ordered by: year</span>
+<span class="co">#&gt;    class               year       n</span>
+<span class="co">#&gt;    &lt;chr&gt;              &lt;int&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 Aves                1991 3183184</span>
+<span class="co">#&gt;  2 Mammalia            1991  100931</span>
+<span class="co">#&gt;  3 Actinopterygii      1991  363791</span>
+<span class="co">#&gt;  4 Amphibia            1991   18443</span>
+<span class="co">#&gt;  5 Reptilia            1991   29806</span>
+<span class="co">#&gt;  6 Elasmobranchii      1991   17521</span>
+<span class="co">#&gt;  7 Holocephali         1991    1048</span>
+<span class="co">#&gt;  8 Cephalaspidomorphi  1991    1152</span>
+<span class="co">#&gt;  9 Thaliacea           1991     669</span>
+<span class="co">#&gt; 10 Sarcopterygii       1991      13</span>
+<span class="co">#&gt; # … with more rows</span></code></pre></div>
+<p>Recall that when database connections in <code>dplyr</code>, the data remains in the database (i.e. on disk, not in working RAM).<br>
+This is fine for any further operations using <code>dplyr</code>/<code>tidyr</code> functions which can be translated into SQL.<br>
+Using such functions we can usually reduce our resulting table to something much smaller, which can then be pulled into memory in R for further analysis using <code><a href="https://dplyr.tidyverse.org/reference/compute.html">collect()</a></code>:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org">forcats</a></span><span class="op">)</span>
+
+<span class="co"># GBIF: the global bird information facility?</span>
+<span class="va">growth</span> <span class="op"><a href="https://forcats.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://forcats.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>class <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_lump.html">fct_lump_n</a></span><span class="op">(</span><span class="va">class</span>, <span class="fl">6</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://forcats.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">year</span>, <span class="va">n</span>, fill<span class="op">=</span><span class="va">class</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"GBIF observations by class"</span><span class="op">)</span></code></pre></div>
+<p><img src="../man/figures/README-unnamed-chunk-9-1.png" width="100%"></p>
+</div>
 </div>
   </div>
 
