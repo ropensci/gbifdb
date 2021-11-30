@@ -1,6 +1,6 @@
 Package: gbifdb
 Version: 0.1.0
-Title: Local Database Interface to GBIF
+Title: Local Database Interface to 'GBIF'
 Description: A high performance interface to the Global Biodiversity
   Information Facility, 'GBIF'.  In contrast to 'rgbif', which can
   access small subsets of 'GBIF' data through web-based queries to
@@ -9,7 +9,7 @@ Description: A high performance interface to the Global Biodiversity
   providers, providing full support for arbitrary 'SQL' or 'dplyr'
   operations on the complete 'GBIF' data tables (now over 1 billion
   records, and over a terrabyte in size.) 'gbifdb' accesses a copy
-  of the "GBIF" data in 'parquet' format, which is already readily
+  of the 'GBIF' data in 'parquet' format, which is already readily
   available in commercial computing clouds such as the Amazon Open
   Data portal and the Microsoft Planetary Computer, or can be 
   accessed directly or downloaded
