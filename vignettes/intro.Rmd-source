@@ -7,7 +7,17 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>"
+)
 
+Sys.setenv("GBIF_HOME"="/minio/shared-data/occurrence.parquet")
+
+```
 
 The goal of `gbifdb` is to provide a relational database interface to a `parquet` based serializations of `gbif` data. 
 Instead of requiring custom functions for filtering and selecting data from the central GBIF server (as in `rgbif`), `gbifdb` users can take advantage of the full array of `dplyr` and `tidyr` functions which can be automatically translated to SQL by `dbplyr`.
@@ -55,8 +65,7 @@ devtools::install_github("cboettig/gbifdb")
 
 ## Getting Started
 
-
-```r
+```{r message=FALSE}
 library(gbifdb)
 library(dplyr)  # optional, for dplyr-based operations
 ```
@@ -65,25 +74,16 @@ library(dplyr)  # optional, for dplyr-based operations
 
 To begin working with GBIF data directly without downloading the data first, simply establish a remote connection using `gbif_remote()`.
 
-
-```r
+```{r}
 gbif <- gbif_remote()
 ```
 
 We can now perform most `dplyr` operations:
 
-
-```r
+```{r}
 gbif %>%
   filter(phylum == "Chordata", year > 1990) %>%
   count(class, year)
-#> FileSystemDataset (query)
-#> class: string
-#> year: int32
-#> n: int32
-#> 
-#> * Grouped by class
-#> See $.data for the source Arrow object
 ```
 
 By default, this relies on an `arrow` connection, which currently lacks support for some more complex windowed operations in `dplyr`.
@@ -120,96 +120,29 @@ Once you have downloaded the parquet-formatted GBIF data,
 simply point `gbif_conn()` at the directory containing your parquet files to initialize a connection.
 (By default, `gbif_conn()` will look for data in the configurable directory given by `gbif_dir()`).
 
-
-```r
+```{r}
 conn <- gbif_conn()
 ```
 
 
 The resulting connection can be used with `dplyr::tbl()` to access the full gbif data:
 
-
-```r
+```{r}  
 gbif <- tbl(conn, "gbif")
 gbif
-#> # Source:   table<gbif> [?? x 50]
-#> # Database: duckdb_connection
-#>        gbifid datasetkey  occurrenceid   kingdom phylum class order family genus
-#>         <dbl> <chr>       <chr>          <chr>   <chr>  <chr> <chr> <chr>  <chr>
-#>  1 1851456555 b234abf6-4… 03871B11FFA43… Animal… Echin… Holo… Dend… Cucum… Acti…
-#>  2 1851456618 b234abf6-4… 03871B11FFAA3… Animal… Echin… Holo… Dend… Scler… Clad…
-#>  3 1851456554 b234abf6-4… 03871B11FFA53… Animal… Echin… Holo… Dend… Cucum… Acti…
-#>  4 1851456620 b234abf6-4… 03871B11FFA03… Animal… Echin… Holo… Dend… Phyll… Tria…
-#>  5 1851456556 b234abf6-4… 03871B11FFA83… Animal… Echin… Holo… Dend… Scler… Glob…
-#>  6 1851456619 b234abf6-4… 03871B11FFA33… Animal… Echin… Holo… Dend… Phyll… Mass…
-#>  7 1851456623 b234abf6-4… 03871B11FFA03… Animal… Echin… Holo… Dend… Phyll… Tria…
-#>  8 1851456714 b234abf6-4… 03871B11FFAC3… Animal… Echin… Holo… Dend… Phyll… Mass…
-#>  9 1851456553 b234abf6-4… 03871B11FFAA3… Animal… Echin… Holo… Dend… Scler… Clad…
-#> 10 1851456622 b234abf6-4… 03871B11FFA53… Animal… Echin… Holo… Dend… Cucum… Acti…
-#> # … with more rows, and 41 more variables: species <chr>,
-#> #   infraspecificepithet <chr>, taxonrank <chr>, scientificname <chr>,
-#> #   verbatimscientificname <chr>, verbatimscientificnameauthorship <chr>,
-#> #   countrycode <chr>, locality <chr>, stateprovince <chr>,
-#> #   occurrencestatus <chr>, individualcount <int>, publishingorgkey <chr>,
-#> #   decimallatitude <dbl>, decimallongitude <dbl>,
-#> #   coordinateuncertaintyinmeters <dbl>, coordinateprecision <dbl>, …
 ```
 
-
-```r
+```{r}
 colnames(gbif)
-#>  [1] "gbifid"                           "datasetkey"                      
-#>  [3] "occurrenceid"                     "kingdom"                         
-#>  [5] "phylum"                           "class"                           
-#>  [7] "order"                            "family"                          
-#>  [9] "genus"                            "species"                         
-#> [11] "infraspecificepithet"             "taxonrank"                       
-#> [13] "scientificname"                   "verbatimscientificname"          
-#> [15] "verbatimscientificnameauthorship" "countrycode"                     
-#> [17] "locality"                         "stateprovince"                   
-#> [19] "occurrencestatus"                 "individualcount"                 
-#> [21] "publishingorgkey"                 "decimallatitude"                 
-#> [23] "decimallongitude"                 "coordinateuncertaintyinmeters"   
-#> [25] "coordinateprecision"              "elevation"                       
-#> [27] "elevationaccuracy"                "depth"                           
-#> [29] "depthaccuracy"                    "eventdate"                       
-#> [31] "day"                              "month"                           
-#> [33] "year"                             "taxonkey"                        
-#> [35] "specieskey"                       "basisofrecord"                   
-#> [37] "institutioncode"                  "collectioncode"                  
-#> [39] "catalognumber"                    "recordnumber"                    
-#> [41] "identifiedby"                     "dateidentified"                  
-#> [43] "license"                          "rightsholder"                    
-#> [45] "recordedby"                       "typestatus"                      
-#> [47] "establishmentmeans"               "lastinterpreted"                 
-#> [49] "mediatype"                        "issue"
 ```
 
 Now, we can use `dplyr` to perform standard queries: 
 
-
-```r
+```{r}
 growth <- gbif %>% 
   filter(phylum == "Chordata", year > 1990) %>%
   count(class, year) %>% arrange(year)
 growth
-#> # Source:     lazy query [?? x 3]
-#> # Database:   duckdb_connection
-#> # Groups:     class
-#> # Ordered by: year
-#>    class               year       n
-#>    <chr>              <int>   <dbl>
-#>  1 Aves                1991 3183184
-#>  2 Mammalia            1991  100931
-#>  3 Actinopterygii      1991  363791
-#>  4 Amphibia            1991   18443
-#>  5 Reptilia            1991   29806
-#>  6 Elasmobranchii      1991   17521
-#>  7 Holocephali         1991    1048
-#>  8 Cephalaspidomorphi  1991    1152
-#>  9 Thaliacea           1991     669
-#> 10 Sarcopterygii       1991      13
-#> # … with more rows
 ```
 
 Recall that when database connections in `dplyr`, the data remains in the database (i.e. on disk, not in working RAM).  
@@ -217,13 +150,12 @@ This is fine for any further operations using `dplyr`/`tidyr` functions which ca
 Using such functions we can usually reduce our resulting table to something much smaller, 
 which can then be pulled into memory in R for further analysis using `collect()`:
 
-
-```r
+```{r}
 library(ggplot2)
 library(forcats)
 
 # GBIF: the global bird information facility?
-growth %>% 
+growth %>%
   collect() %>%
   mutate(class = fct_lump_n(class, 6)) %>%
   ggplot(aes(year, n, fill=class)) + geom_col() +
@@ -231,7 +163,7 @@ growth %>%
 ```
 
 
-<img src="../man/figures/README-unnamed-chunk-9-1.png" width="100%" />
 
-
-
+```{r include=FALSE}
+Sys.unsetenv("GBIF_HOME")
+```
