@@ -24,11 +24,6 @@ gbif_remote <-
         if (!requireNamespace("arrow", quietly = TRUE)) {
             stop("please install arrow first")
         }
-        info <- arrow::arrow_info()
-        if (!info$capabilities[["s3"]]) {
-            stop("arrow was not installed with S3 support.")
-        }
-
 
         server <-
          arrow::s3_bucket(bucket, ...)
