@@ -23,15 +23,10 @@
 #' gbif_download()
 #'
 gbif_download <-
-  function(version = "2021-11-01",
-           dir = gbif_dir()
-           ){
-
+  function(version = "2021-11-01", dir = gbif_dir()) {
   ## Fixme detect version, maybe w/o AWS dependency
-
   if (!requireNamespace("aws.s3", quietly = TRUE)) {
-    message("the aws.s3 package is required for automatic download")
-    return(invisible(NULL))
+    stop("the aws.s3 package is required for automatic download", call. = FALSE)
   }
   ## Public access fails if user has a secret key configured
   Sys.unsetenv("AWS_SECRET_ACCESS_KEY")
