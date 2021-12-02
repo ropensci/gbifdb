@@ -29,7 +29,7 @@ gbif_download <-
 
   ## Fixme detect version, maybe w/o AWS dependency
 
-  if(!requireNamespace("aws.s3", quietly = TRUE)){
+  if (!requireNamespace("aws.s3", quietly = TRUE)) {
     message("the aws.s3 package is required for automatic download")
     return(invisible(NULL))
   }
@@ -41,18 +41,3 @@ gbif_download <-
                  prefix = paste0("occurrence/", version),
                  region = "ap-southeast-2")
 }
-
-
-#' Default storage location
-#'
-#' Default location can be set with the env var GBIF_HOME,
-#' otherwise will use the default provided by [tools::R_user_dir()]
-#'
-#' @export
-gbif_dir <- function(){
-  Sys.getenv("GBIF_HOME",
-             tools::R_user_dir("gbif"))
-
-}
-
-

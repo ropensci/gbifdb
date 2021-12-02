@@ -18,19 +18,24 @@
 #'
 gbif_remote <-
     function(version = "2021-11-01",
-            bucket = "gbif-open-data-af-south-1",
-            to_duckdb = FALSE,
-            ...) {
-
-    server <- arrow::s3_bucket(bucket, ...)
-    prefix <- paste0("/occurrence/", version, "/occurrence.parquet/")
-    path <- server$path(prefix)
-    df <- arrow::open_dataset(path)
-    if (to_duckdb) {
-        if (!requireNamespace("dplyr", quietly = TRUE))
-            stop("please install dplyr to use duckdb-based format")
-        tbl <- getExportedValue("dplyr", "tbl")
-        df <- arrow::to_duckdb(df)
+             bucket = "gbif-open-data-af-south-1",
+             to_duckdb = FALSE,
+             ...) {
+        if (!requireNamespace("arrow", quietly = TRUE)) 
+            stop("please install arrow first")
+        server <-
+         arrow::s3_bucket(bucket, ...)
+        prefix <- 
+          paste0("/occurrence/",
+                 version,
+                 "/occurrence.parquet/")
+        path <- server$path(prefix)
+        df <- arrow::open_dataset(path)
+        if (to_duckdb) {
+            if (!requireNamespace("dplyr", quietly = TRUE)) {
+                stop("please install dplyr first")
+            }
+            df <- arrow::to_duckdb(df)
+        }
+        df
     }
-    df
-}
