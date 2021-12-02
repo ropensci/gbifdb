@@ -27,12 +27,21 @@ test_that("gbif_dir()", {
 test_that("gbif_remote()", {
   # skip_on_cran()
   skip_if_offline()
+
+  info <- arrow::arrow_info()
+  has_s3 <- info$capabilities[["s3"]]
+  skip_if_not(has_s3)
+
   conn <- gbif_remote(to_duckdb = FALSE)
   expect_true(inherits(conn, "Dataset"))
 })
 
 test_that("gbif_remote(to_duckdb=TRUE)....slow!", {
   # skip_on_cran()
+
+  info <- arrow::arrow_info()
+  has_s3 <- info$capabilities[["s3"]]
+  skip_if_not(has_s3)
   skip_if_offline()
   library(arrow)
   library(dplyr)
