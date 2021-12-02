@@ -21,8 +21,15 @@ gbif_remote <-
              bucket = "gbif-open-data-af-south-1",
              to_duckdb = FALSE,
              ...) {
-        if (!requireNamespace("arrow", quietly = TRUE)) 
+        if (!requireNamespace("arrow", quietly = TRUE)) {
             stop("please install arrow first")
+        }
+        info <- arrow::arrow_info()
+        if (!info$capabilities[["s3"]]) {
+            stop("arrow was not installed with S3 support.")
+        }
+
+
         server <-
          arrow::s3_bucket(bucket, ...)
         prefix <- 
