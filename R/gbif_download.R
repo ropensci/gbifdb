@@ -1,5 +1,6 @@
 ## Developer NOTE: consider switchng to arrow::S3FileSystem-based method.
-## doesn't support sync out-of-box, but lighter dependency since arrow is already in use.
+## doesn't support sync out-of-box, but lighter dependency 
+## since arrow is already in use.
 
 
 #' Download GBIF data using aws.s3 sync
