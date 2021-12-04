@@ -37,12 +37,17 @@ test_that("gbif_remote()", {
 })
 
 test_that("gbif_remote(to_duckdb=TRUE)....slow!", {
-  # skip_on_cran()
+
+  #skip()
 
   info <- arrow::arrow_info()
   has_s3 <- info$capabilities[["s3"]]
   skip_if_not(has_s3)
+
   skip_if_offline()
+  skip_on_cran()
+  
+
   library(arrow)
   library(dplyr)
   conn <- gbif_remote(to_duckdb = TRUE)
