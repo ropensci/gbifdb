@@ -171,6 +171,7 @@ growth %>%
 
 ```{r include=FALSE}
 Sys.unsetenv("GBIF_HOME")
+codemeta::write_codemeta()
 ```
 
 

@@ -7,3 +7,5 @@
 ^CODE_OF_CONDUCT\.md$
 ^docs$
 ^paper$
+codemeta.json
+
