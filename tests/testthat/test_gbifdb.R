@@ -38,7 +38,7 @@ test_that("gbif_remote()", {
 
 test_that("gbif_remote(to_duckdb=TRUE)....slow!", {
 
-  #skip()
+  skip("CI strangeness")
 
   info <- arrow::arrow_info()
   has_s3 <- info$capabilities[["s3"]]
