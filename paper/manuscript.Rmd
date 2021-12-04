@@ -1,0 +1,59 @@
+---
+title: "Cloud-native access to large ecological databases"
+author:
+  - name: "Carl Boettiger"
+    affiliation: ucb, ropensci
+address:
+  - code: ucb
+    address: "Dept of Environmental Science, Policy, and Management, University of California Berkeley, Berkeley CA 94720-3114, USA"
+  - code: ropensci
+    address: "The rOpenSci Project, University of California Berkeley, Berkeley CA 94720-3114, USA" 
+abstract: |
+  1) Large ecological databases play an important and growing role in ecological research. 
+  2) Traditional approaches to dealing with this data computationally inefficient and often at odds with best practices in ecological data management. 
+  3) "Cloud-native" approaches to data access provide an powerful way to address these short-comings, and should be more widely adopted.
+  4) I illustrate this approach using the Global Biodiversity Information Facility (GBIF) database.
+  
+journal: "Methods in Ecology & Evolution"
+date: "`r Sys.Date()`"
+bibliography: refs.bib
+layout: 3p
+header-includes:
+   - \usepackage{lineno}
+   - \linenumbers
+output: rticles::elsevier_article
+---
+
+```{r message=FALSE, include = FALSE}
+library(gbifdb)
+library(tidyverse)
+```
+
+
+
+
+Large databases such as GBIF [@gbif] or eBird [@ebird] are increasing common in ecological research.
+I use "Large" to refer to any dataset for which the size alone makes some common workflows impractical, such as downloading a spreadsheet and opening it directly in an application such as R or Excel which must load the data into working memory (computer RAM).
+In such cases, it is desirable for the user to filter out the parts of the data that they need before downloading or reading it in to a software program. 
+
+Relational databases such as MySQL, Postgres, or more recently, duckdb, play a key role in working with large data.
+Historically, these databases have relied on a client-server model, in which a powerful central computer (the "server") could be accessed by many independent "client" machines.
+The server was responsible for holding the database and executing search and filtering queries to extract the desired data elements for each individual client. 
+To mitigate load and potential security issues and to facilitate access for users unfamiliar with the standard SQL (Structured Query Language) syntax, many data providers deploy an additional software layer between the server 
+
+
+Nearly a decade ago, I co-founded the rOpenSci project [@ropensci], largely as an effort to bridge the divide between the rapid proliferation of ecologically relevant web-based data servers and the heavily R-based ecological research community. 
+Today, the project includes over 330 packages (from 175 maintainers). 
+Many of these packages access REST-ful APIs (REpresentational State Transfer Application Programming Interfaces), which take queries in the form of URLs (Uniform Resource Locators) and return data in small paginated packets of data, often in the JSON (Javascript Object Notation) serialization. 
+These REST-based interfaces were an advance over earlier protocols, such as the much more complicated SOAP [@soap], or 
+
+
+# Acknowledgments
+
+
+# Data Availability
+
+\pagebreak
+
+
+# References
