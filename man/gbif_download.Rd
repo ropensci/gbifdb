@@ -23,6 +23,8 @@ https://registry.opendata.aws/gbif/ which should be synced.}
 
 \item{bucket}{S3 bucket name, must match desired region}
 
+\item{prefix}{prefix to occurence data}
+
 \item{region}{S3 data region, see AWS Open Data Registry.}
 }
 \description{
