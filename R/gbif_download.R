@@ -10,6 +10,7 @@
 #' https://registry.opendata.aws/gbif/ which should be synced.
 #' @param dir path to local directory where parquet files should be stored
 #' @param base_url S3 Bucket Base URL
+#' @param prefix prefix to occurence data
 #' @param bucket S3 bucket name, must match desired region
 #' @param region S3 data region, see AWS Open Data Registry.
 #' @details
