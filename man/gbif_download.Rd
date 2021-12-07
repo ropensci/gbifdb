@@ -4,20 +4,33 @@
 \alias{gbif_download}
 \title{Download GBIF data using aws.s3 sync}
 \usage{
-gbif_download(version = "2021-11-01", dir = gbif_dir())
+gbif_download(
+  version = "2021-11-01",
+  dir = gbif_dir(),
+  base_url = "s3.amazonaws.com",
+  bucket = "gbif-open-data-ap-southeast-2",
+  prefix = paste0("occurrence/", version),
+  region = "ap-southeast-2"
+)
 }
 \arguments{
 \item{version}{'prefix' string (folder) from the
 https://registry.opendata.aws/gbif/ which should be synced.}
 
 \item{dir}{path to local directory where parquet files should be stored}
+
+\item{base_url}{S3 Bucket Base URL}
+
+\item{bucket}{S3 bucket name, must match desired region}
+
+\item{region}{S3 data region, see AWS Open Data Registry.}
 }
 \description{
 Sync a local directory with selected release of the AWS copy of GBIF
 }
 \details{
 Sync parquet files from GBIF public data catalogue,
-https://registry.opendata.aws/gbif/
+\url{https://registry.opendata.aws/gbif/}
 
 Note that data can also be found on the Microsoft Cloud,
 https://planetarycomputer.microsoft.com/dataset/gbif
