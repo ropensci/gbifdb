@@ -9,9 +9,12 @@
 #' @param version 'prefix' string (folder) from the 
 #' https://registry.opendata.aws/gbif/ which should be synced.
 #' @param dir path to local directory where parquet files should be stored
+#' @param base_url S3 Bucket Base URL
+#' @param bucket S3 bucket name, must match desired region
+#' @param region S3 data region, see AWS Open Data Registry.
 #' @details
 #' Sync parquet files from GBIF public data catalogue,
-#' https://registry.opendata.aws/gbif/
+#' <https://registry.opendata.aws/gbif/>
 #'
 #' Note that data can also be found on the Microsoft Cloud,
 #' https://planetarycomputer.microsoft.com/dataset/gbif
@@ -24,16 +27,21 @@
 #' gbif_download()
 #'
 gbif_download <-
-  function(version = "2021-11-01", dir = gbif_dir()) {
+  function(version = "2021-11-01", 
+           dir = gbif_dir(),
+           base_url = "s3.amazonaws.com",
+           bucket = "gbif-open-data-ap-southeast-2",
+           prefix = paste0("occurrence/", version),
+           region = "ap-southeast-2") {
   ## Fixme detect version, maybe w/o AWS dependency
   if (!requireNamespace("aws.s3", quietly = TRUE)) {
     stop("the aws.s3 package is required for automatic download", call. = FALSE)
   }
   ## Public access fails if user has a secret key configured
-  Sys.unsetenv("AWS_SECRET_ACCESS_KEY")
+  unset_aws_env()
   aws.s3::s3sync(dir,
-                 base_url = "s3.amazonaws.com",
-                 bucket = "gbif-open-data-ap-southeast-2",
-                 prefix = paste0("occurrence/", version),
-                 region = "ap-southeast-2")
+                 base_url = base_url,
+                 bucket = bucket,
+                 prefix = prefix,
+                 region = region)
 }
