@@ -12,3 +12,15 @@ gbif_dir <- function(){
              tools::R_user_dir("gbif"))
 
 }
+
+
+gbif_parquet_dir <- function(version = gbif_latest_version(gbif_default_bucket()),
+                             dir = gbif_dir()
+                            ){
+  
+  file.path(dir,
+            "occurrence",
+            version,
+            "occurrence.parquet")
+
+}

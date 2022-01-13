@@ -1,48 +1,50 @@
-## Developer NOTE: consider switchng to arrow::S3FileSystem-based method.
-## doesn't support sync out-of-box, but lighter dependency 
-## since arrow is already in use.
-
 
 #' Download GBIF data using aws.s3 sync
-#'
+#' 
 #' Sync a local directory with selected release of the AWS copy of GBIF
-#' @param version 'prefix' string (folder) from the 
-#' https://registry.opendata.aws/gbif/ which should be synced.
-#' @param dir path to local directory where parquet files should be stored
-#' @param base_url S3 Bucket Base URL
-#' @param prefix prefix to occurence data
-#' @param bucket S3 bucket name, must match desired region
-#' @param region S3 data region, see AWS Open Data Registry.
+#' @param version Release date (YYYY-MM-DD) which should be synced. Will
+#' detect latest version by default.  
+#' @param dir path to local directory where parquet files should be stored.
+#'  Fine to leave at default, see [gbif_dir()].
+#' @param bucket Name of the regional S3 bucket desired.  
+#' Default is "gbif-open-data-us-east-1". Select a bucket closer to your
+#' compute location for improved performance, e.g. European researchers may
+#' prefer "gbif-open-data-eu-central-1" etc.
+#' @param region bucket region (usually ignored? Just set the bucket appropriately)
+#' 
 #' @details
 #' Sync parquet files from GBIF public data catalogue,
-#' <https://registry.opendata.aws/gbif/>
-#'
+#' https://registry.opendata.aws/gbif/. 
+#' Setting a bucket t
+#' 
 #' Note that data can also be found on the Microsoft Cloud,
 #' https://planetarycomputer.microsoft.com/dataset/gbif
-#'
+#' 
 #' Also, some users may prefer to download this data using an alternative
 #' interface or work on a cloud-host machine where data is already available.
 #' @export
-#'
+#' 
 #' @examplesIf interactive()
 #' gbif_download()
-#'
+#' 
 gbif_download <-
-  function(version = "2021-11-01", 
-           dir = gbif_dir(),
-           base_url = "s3.amazonaws.com",
-           bucket = "gbif-open-data-ap-southeast-2",
-           prefix = paste0("occurrence/", version),
-           region = "ap-southeast-2") {
-  ## Fixme detect version, maybe w/o AWS dependency
-  if (!requireNamespace("aws.s3", quietly = TRUE)) {
-    stop("the aws.s3 package is required for automatic download", call. = FALSE)
+  function(version = gbif_latest_version(),
+           dir = gbif_parquet_dir(version),
+           bucket = gbif_default_bucket(),
+           region = "us-east-1"
+           ){
+
+  if(!requireNamespace("aws.s3", quietly = TRUE)){
+    message("the aws.s3 package is required for automatic download")
+    return(invisible(NULL))
   }
   ## Public access fails if user has a secret key configured
   unset_aws_env()
+  
+  ## Consider sync via arrow instead?  (very low level interface tho)
   aws.s3::s3sync(dir,
-                 base_url = base_url,
+                 base_url = "s3.amazonaws.com",
                  bucket = bucket,
-                 prefix = prefix,
+                 prefix = version,
                  region = region)
 }
