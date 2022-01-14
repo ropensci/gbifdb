@@ -5,34 +5,33 @@
 \title{Download GBIF data using aws.s3 sync}
 \usage{
 gbif_download(
-  version = "2021-11-01",
-  dir = gbif_dir(),
-  base_url = "s3.amazonaws.com",
-  bucket = "gbif-open-data-ap-southeast-2",
-  prefix = paste0("occurrence/", version),
-  region = "ap-southeast-2"
+  version = gbif_latest_version(),
+  dir = gbif_parquet_dir(version),
+  bucket = gbif_default_bucket(),
+  region = "us-east-1"
 )
 }
 \arguments{
-\item{version}{'prefix' string (folder) from the
-https://registry.opendata.aws/gbif/ which should be synced.}
+\item{version}{Release date (YYYY-MM-DD) which should be synced. Will
+detect latest version by default.}
 
-\item{dir}{path to local directory where parquet files should be stored}
+\item{dir}{path to local directory where parquet files should be stored.
+Fine to leave at default, see \code{\link[=gbif_dir]{gbif_dir()}}.}
 
-\item{base_url}{S3 Bucket Base URL}
+\item{bucket}{Name of the regional S3 bucket desired.
+Default is "gbif-open-data-us-east-1". Select a bucket closer to your
+compute location for improved performance, e.g. European researchers may
+prefer "gbif-open-data-eu-central-1" etc.}
 
-\item{bucket}{S3 bucket name, must match desired region}
-
-\item{prefix}{prefix to occurence data}
-
-\item{region}{S3 data region, see AWS Open Data Registry.}
+\item{region}{bucket region (usually ignored? Just set the bucket appropriately)}
 }
 \description{
 Sync a local directory with selected release of the AWS copy of GBIF
 }
 \details{
 Sync parquet files from GBIF public data catalogue,
-\url{https://registry.opendata.aws/gbif/}
+https://registry.opendata.aws/gbif/.
+Setting a bucket t
 
 Note that data can also be found on the Microsoft Cloud,
 https://planetarycomputer.microsoft.com/dataset/gbif

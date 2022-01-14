@@ -5,9 +5,10 @@
 \title{gbif remote}
 \usage{
 gbif_remote(
-  version = "2021-11-01",
-  bucket = "gbif-open-data-af-south-1",
+  version = gbif_latest_version(),
+  bucket = gbif_default_bucket(),
   to_duckdb = FALSE,
+  safe = TRUE,
   ...
 )
 }
@@ -20,15 +21,26 @@ gbif_remote(
 Note that leaving as FALSE may be faster but is limited to the dplyr-style
 operations supported by \link{arrow} alone.}
 
+\item{safe}{logical, default TRUE.  Should we exclude columns \verb{mediatype`` and }issue`?
+varchar datatype on these columns substantially slows downs queries.}
+
 \item{...}{additional parameters passed to the s3_bucket() (e.g. for remote
 access to independently hosted buckets)}
 }
 \description{
 Connect to GBIF remote directly. Can be much faster than downloading
 for one-off use or when using the package from a server in the same region
-as the data.
+as the data. See Details.
+}
+\details{
+Query performance is dramatically improved in queries that return only
+a subset of columns. Consider using explicit \code{select()} commands to return only
+the columns you need.
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+
+gbif <- gbif_remote()
+gbif()
 \dontshow{\}) # examplesIf}
 }

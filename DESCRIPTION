@@ -1,5 +1,5 @@
 Package: gbifdb
-Version: 0.1.0
+Version: 0.1.1
 Title: Local Database Interface to 'GBIF'
 Description: A high performance interface to the Global Biodiversity
   Information Facility, 'GBIF'.  In contrast to 'rgbif', which can

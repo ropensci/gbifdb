@@ -5,9 +5,18 @@
 #' @export
 #' @examplesIf interactive()
 #' gbif <- gbif_local(gbif_example_data())
-#' @importFrom dplyr tbl
+#' @importFrom dplyr tbl any_of
 #' @inheritParams gbif_conn
-gbif_local <- function(dir = gbif_parquet_dir(), tblname="gbif"){
-  conn <- gbif_conn(dir, tblname)
-  dplyr::tbl(conn, tblname)
+#' @param safe logical, default TRUE.  Should we exclude columns `mediatype`` and `issue`?
+#' varchar datatype on these columns substantially slows downs queries.
+gbif_local <- function(dir = gbif_parquet_dir(),
+                       tblname="gbif",
+                       backend = "arrow",
+                       safe = TRUE){
+  conn <- gbif_conn(dir, tblname, backend)
+  gbif <- dplyr::tbl(conn, tblname)
+  if (safe) {
+          gbif <- dplyr::select(gbif, -dplyr::any_of(c("mediatype", "issue")))
+  }
+  gbif
 }

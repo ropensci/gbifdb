@@ -4,12 +4,14 @@
 \alias{gbif_conn}
 \title{A \verb{[DBI]}-style database connection to GBIF data}
 \usage{
-gbif_conn(dir = gbif_dir(), tblname = "gbif")
+gbif_conn(dir = gbif_dir(), tblname = "gbif", backend = c("arrow", "duckdb"))
 }
 \arguments{
 \item{dir}{the directory containing all parquet files to be read}
 
 \item{tblname}{name of the table to be created in the duckdb VIEW}
+
+\item{backend}{Use arrow or duckdb as backend connection?}
 }
 \value{
 a \code{DBIconnection} object
