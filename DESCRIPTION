@@ -1,5 +1,5 @@
 Package: gbifdb
-Version: 0.1.0
+Version: 0.1.1
 Title: Local Database Interface to 'GBIF'
 Description: A high performance interface to the Global Biodiversity
   Information Facility, 'GBIF'.  In contrast to 'rgbif', which can
@@ -25,10 +25,10 @@ Depends: R (>= 4.0)
 Imports:
     arrow (>= 6.0.1),
     duckdb (>= 0.2.9),
-    DBI
+    DBI,
+    dplyr
 Suggests:
     spelling,
-    dplyr,
     dbplyr,
     testthat (>= 3.0.0),
     covr,

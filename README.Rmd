@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 
 
-Sys.setenv("GBIF_HOME"="/minio/shared-data/occurrence.parquet")
+Sys.setenv("GBIF_HOME"="/home/shared-data/gbif")
 
 ```
 
@@ -103,6 +103,7 @@ table will probably exceed available RAM and crash your R session!
 When using a `gbif_remote()` connection, 
 all I/O operations will be conducted over the network storage instead of your local disk,
 without downloading the full dataset first.
+Consequently, this mechanism will perform best on platforms with faster network connections.
 These operations will be considerably slower than they would be if you download the entire dataset first 
 (see below, unless you are on an AWS cloud instance in the same region as the remote host), but this does
 avoid the download step all-together, which may be necessary if you do not have 100+ GB free storage space
@@ -123,18 +124,13 @@ By default, this will download to the dir given by `gbif_dir()`.
 An alternative directory can be set as an argument, or by setting the path in the environmental variable, `GBIF_HOME`.
 
 Once you have downloaded the parquet-formatted GBIF data, 
-simply point `gbif_conn()` at the directory containing your parquet files to initialize a connection.
-(By default, `gbif_conn()` will look for data in the configurable directory given by `gbif_dir()`).
-
-```{r}
-conn <- gbif_conn()
-```
+simply point `gbif_local()` at the directory containing your parquet files to initialize a connection.
 
 
 The resulting connection can be used with `dplyr::tbl()` to access the full gbif data:
 
 ```{r}  
-gbif <- tbl(conn, "gbif")
+gbif <- gbif_local()
 gbif
 ```
 
@@ -167,6 +163,10 @@ growth %>%
   ggtitle("GBIF observations by class")
 ```
 
+
+## Performance notes
+
+Because `parquet` is a columnar-oriented dataset, performance can be improved by including a `select()` call at the end of a dplyr function chain to only return the columns you actually need. This can be particularly helpful on remote connections using `gbif_remote()`.
 
 
 ```{r include=FALSE}
