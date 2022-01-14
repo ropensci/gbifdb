@@ -7,11 +7,12 @@
 #' @param all show all versions? (logical, default `FALSE`)
 #' @param ... additional arguments to [arrow::s3_bucket]
 #' @export
+#' @examples
+#' ## Latest local version available:
+#' gbif_version(local=TRUE)
 #' @examplesIf interactive()
 #' ## Latest online version available:
 #' gbif_version()
-#' ## Latest local version available:
-#' gbif_version(local=FALSE)
 #' ## All online versions:
 #' gbif_version(all=TRUE)
 #' 
@@ -34,12 +35,14 @@ gbif_version <- function(local = FALSE,
   )
   if(all) return(versions)
   
+  
   latest_version(versions)
 }
 
 latest_version <- function(versions) {
+  suppressWarnings(
   as.character(max(as.Date(versions)))
-  
+  )
 }
 
 remote_versions <- function(bucket = gbif_default_bucket(), ...) {

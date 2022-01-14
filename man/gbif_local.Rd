@@ -29,6 +29,8 @@ Local connection to a downloaded GBIF Parquet database
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+
+
 gbif <- gbif_local(gbif_example_data())
 \dontshow{\}) # examplesIf}
 }

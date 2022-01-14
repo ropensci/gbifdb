@@ -8,7 +8,7 @@
 #' @return a `DBIconnection` object
 #' @export
 #' 
-#' @examples
+#' @examplesIf interactive()
 #' 
 #' gbif.parquet <- gbif_example_data()
 #' con <- gbif_conn(gbif.parquet)

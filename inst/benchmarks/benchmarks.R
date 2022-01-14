@@ -3,7 +3,7 @@ library(dplyr)
 library(gbifdb)
 library(bench)
 
-Sys.setenv("GBIFDB_HOME"="/home/shared-data/gbif")
+Sys.setenv("GBIF_HOME"="/home/shared-data/gbif")
 
 Sys.unsetenv("AWS_DEFAULT_REGION")
 Sys.unsetenv("AWS_S3_ENDPOINT")

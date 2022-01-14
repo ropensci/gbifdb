@@ -27,11 +27,11 @@ gbif_version(
 Can also return latest locally downloaded version, or list all versions
 }
 \examples{
+## Latest local version available:
+gbif_version(local=TRUE)
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 ## Latest online version available:
 gbif_version()
-## Latest local version available:
-gbif_version(local=FALSE)
 ## All online versions:
 gbif_version(all=TRUE)
 \dontshow{\}) # examplesIf}

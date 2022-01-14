@@ -24,8 +24,9 @@ a \code{DBIconnection} object
 Returns a database connection to the local GBIF parquet file.
 }
 \examples{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 
 gbif.parquet <- gbif_example_data()
 con <- gbif_conn(gbif.parquet)
-
+\dontshow{\}) # examplesIf}
 }

@@ -1,3 +1,5 @@
+Sys.setenv("GBIF_HOME"=tempdir())
+
 
 test_that("gbif_example_data()", {
 
