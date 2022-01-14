@@ -14,7 +14,7 @@ gbif_dir <- function(){
 }
 
 
-gbif_parquet_dir <- function(version = gbif_latest_version(gbif_default_bucket()),
+gbif_parquet_dir <- function(version = gbif_version(gbif_default_bucket()),
                              dir = gbif_dir()
                             ){
   

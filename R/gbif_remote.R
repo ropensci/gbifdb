@@ -26,7 +26,7 @@
 #' @export
 #' @importFrom dplyr select
 gbif_remote <-
-    function(version = gbif_latest_version(),
+    function(version = gbif_version(),
              bucket = gbif_default_bucket(),
              to_duckdb = FALSE,
              safe = TRUE,
@@ -45,14 +45,14 @@ gbif_remote <-
         path <- server$path(prefix)
         gbif <- arrow::open_dataset(path)
 
-        if (safe) {
-          gbif <- dplyr::select(gbif, -dplyr::any_of(c("mediatype", "issue")))
-        }
         ## Consider leaving this to the user to call.
         if (to_duckdb) {
             gbif <- arrow::to_duckdb(gbif)
         }
-
+        
+        if (safe) {
+          gbif <- dplyr::select(gbif, -dplyr::any_of(c("mediatype", "issue")))
+        }
         gbif
     }
 

@@ -1,4 +1,3 @@
-context("test gbifdb")
 
 test_that("gbif_example_data()", {
 
@@ -62,18 +61,18 @@ test_that("gbif_remote()", {
 
 test_that("gbif_remote(to_duckdb=TRUE)....slow!", {
 
-  skip("CI strangeness")
-
+  skip_if_offline()
+  skip_on_cran()
+  skip_on_ci()
+  
   info <- arrow::arrow_info()
   has_s3 <- info$capabilities[["s3"]]
   skip_if_not(has_s3)
 
-  skip_if_offline()
-  skip_on_cran()
-  
+  skip("memory not mapped segfault")
 
-  library(arrow)
-  library(dplyr)
+  library(arrow, quietly = TRUE)
+  library(dplyr, quietly = TRUE)
   conn <- gbif_remote(to_duckdb = TRUE)
   expect_true(inherits(conn, "tbl_dbi"))
   duckdb::dbDisconnect(conn$src$con, shutdown = TRUE)

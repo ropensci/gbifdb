@@ -5,7 +5,7 @@
 \title{gbif remote}
 \usage{
 gbif_remote(
-  version = gbif_latest_version(),
+  version = gbif_version(),
   bucket = gbif_default_bucket(),
   to_duckdb = FALSE,
   safe = TRUE,

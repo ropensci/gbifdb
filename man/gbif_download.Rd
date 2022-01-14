@@ -5,7 +5,7 @@
 \title{Download GBIF data using aws.s3 sync}
 \usage{
 gbif_download(
-  version = gbif_latest_version(),
+  version = gbif_version(),
   dir = gbif_parquet_dir(version),
   bucket = gbif_default_bucket(),
   region = "us-east-1"

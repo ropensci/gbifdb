@@ -28,7 +28,7 @@
 #' gbif_download()
 #' 
 gbif_download <-
-  function(version = gbif_latest_version(),
+  function(version = gbif_version(),
            dir = gbif_parquet_dir(version),
            bucket = gbif_default_bucket(),
            region = "us-east-1"

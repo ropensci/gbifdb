@@ -4,7 +4,11 @@
 \alias{gbif_conn}
 \title{A \verb{[DBI]}-style database connection to GBIF data}
 \usage{
-gbif_conn(dir = gbif_dir(), tblname = "gbif", backend = c("arrow", "duckdb"))
+gbif_conn(
+  dir = gbif_parquet_dir(version = gbif_version(local = TRUE)),
+  tblname = "gbif",
+  backend = c("arrow", "duckdb")
+)
 }
 \arguments{
 \item{dir}{the directory containing all parquet files to be read}

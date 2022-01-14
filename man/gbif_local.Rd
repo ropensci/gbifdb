@@ -5,7 +5,7 @@
 \title{Local connection to a downloaded GBIF Parquet database}
 \usage{
 gbif_local(
-  dir = gbif_parquet_dir(),
+  dir = gbif_parquet_dir(version = gbif_version(local = TRUE)),
   tblname = "gbif",
   backend = "arrow",
   safe = TRUE
