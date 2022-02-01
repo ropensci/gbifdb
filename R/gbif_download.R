@@ -10,7 +10,7 @@
 #' https://registry.opendata.aws/gbif/ which should be synced.
 #' @param dir path to local directory where parquet files should be stored
 #' @param base_url S3 Bucket Base URL
-#' @param prefix prefix to occurence data
+#' @param prefix prefix to occurrence data
 #' @param bucket S3 bucket name, must match desired region
 #' @param region S3 data region, see AWS Open Data Registry.
 #' @details
@@ -22,6 +22,9 @@
 #'
 #' Also, some users may prefer to download this data using an alternative
 #' interface or work on a cloud-host machine where data is already available.
+#' Note, these data include all CC0 and CC-BY licensed data in GBIF that have
+#'coordinates which passed automated quality checks,
+#' see <https://github.com/gbif/occurrence/blob/master/aws-public-data.md>.
 #' @export
 #'
 #' @examplesIf interactive()
