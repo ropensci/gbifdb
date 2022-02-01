@@ -25,7 +25,8 @@ Sys.setenv("GBIF_HOME"="/minio/shared-data/occurrence.parquet")
 [![R-CMD-check](https://github.com/cboettig/gbifdb/workflows/R-CMD-check/badge.svg)](https://github.com/cboettig/gbifdb/actions)
 <!-- badges: end -->
 
-The goal of `gbifdb` is to provide a relational database interface to a `parquet` based serializations of `gbif` data. 
+The goal of `gbifdb` is to provide a relational database interface to a `parquet` based serializations of `gbif`'s AWS snapshots of its public data [^1].
+[^1]: all CC0 and CC-BY licensed data in GBIF that have coordinates which passed automated quality checks, [see GBIF docs]https://github.com/gbif/occurrence/blob/master/aws-public-data.md)
 Instead of requiring custom functions for filtering and selecting data from the central GBIF server (as in `rgbif`), `gbifdb` users can take advantage of the full array of `dplyr` and `tidyr` functions which can be automatically translated to SQL by `dbplyr`.
 Users already familiar with SQL can construct SQL queries directly with `DBI` instead. 
 `gbifdb` sends these queries to [`duckdb`](https://duckdb.org), a high-performance, columnar-oriented database engine which runs entirely inside the client,
@@ -44,12 +45,6 @@ The latter approach will be faster for one-off operations and is also suitable w
 
 ## Installation
 
-**NOTE**: `gbifdb` currently requires the dev version of `duckdb`, which you can install using:
-
-```r
-install.packages("https://github.com/duckdb/duckdb/releases/download/master-builds/duckdb_r_src.tar.gz", repos = NULL)
-```
-
 <!--
 
 You can install the released version of `gbifdb` from [CRAN](https://CRAN.R-project.org) with:
@@ -67,7 +62,7 @@ And the development version from [GitHub](https://github.com/) with:
 devtools::install_github("cboettig/gbifdb")
 ```
 
-`gbifdb` has few dependencies: only `duckdb` and `DBI` are required.  
+`gbifdb` has few dependencies: `arrow`, `duckdb` and `DBI` are required.  
 
 ## Getting Started
 
@@ -131,6 +126,9 @@ conn <- gbif_conn()
 ```
 
 
+
+
+
 The resulting connection can be used with `dplyr::tbl()` to access the full gbif data:
 
 ```{r}  
@@ -145,7 +143,7 @@ colnames(gbif)
 Now, we can use `dplyr` to perform standard queries: 
 
 ```{r}
-growth <- gbif %>% 
+growth <- gbif %>%
   filter(phylum == "Chordata", year > 1990) %>%
   count(class, year) %>% arrange(year)
 growth
