@@ -12,12 +12,20 @@
 #' @param version GBIF snapshot date
 #' @param bucket GBIF bucket name (including region)
 #' @param to_duckdb Return a remote duckdb connection or arrow connection?
-#'   Note that leaving as FALSE may be faster but is limited to the dplyr-style
+#'   Note that setting to FALSE may be faster but is limited to the dplyr-style
 #'   operations supported by [arrow] alone.
-#' @param safe logical, default TRUE.  Should we exclude columns `mediatype`` and `issue`?
+#' @param safe logical, default TRUE.  Should we exclude columns `mediatype` and `issue`?
 #' varchar datatype on these columns substantially slows downs queries.
 #' @param ... additional parameters passed to the s3_bucket() (e.g. for remote
 #'  access to independently hosted buckets)
+#' @return a remote tibble `tbl_sql` class object (by deafult), or a arrow 
+#' Dataset query if `to_duckdb` is FALSE.  In either case, users should call
+#'  `[dplyr::collect]` on the final result to force evaluation and bring the
+#'   resulting data into 
+#' memory in R.
+#' @details 
+#' A summary of this GBIF data, along with column meanings can be found at 
+#' <https://github.com/gbif/occurrence/blob/master/aws-public-data.md>
 #' @examplesIf interactive()
 #' 
 #' gbif <- gbif_remote()
@@ -28,7 +36,7 @@
 gbif_remote <-
     function(version = gbif_version(),
              bucket = gbif_default_bucket(),
-             to_duckdb = FALSE,
+             to_duckdb = TRUE,
              safe = TRUE,
              ...) {
         if (!requireNamespace("arrow", quietly = TRUE)) {

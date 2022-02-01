@@ -27,6 +27,10 @@ a remote tibble \code{tbl_sql} class object
 \description{
 Local connection to a downloaded GBIF Parquet database
 }
+\details{
+A summary of this GBIF data, along with column meanings can be found at
+\url{https://github.com/gbif/occurrence/blob/master/aws-public-data.md}
+}
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 
