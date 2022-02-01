@@ -1,6 +1,7 @@
 CMD
 GBIF
 Postgres
+YYYY
 aws
 catalogue
 dev
@@ -8,10 +9,13 @@ dir
 dplyr
 duckdb
 env
+eu
 gbif
 https
 microsoft
 opendata
 planetarycomputer
 rgbif
-terrabyte
+subfolder
+tibble
+varchar

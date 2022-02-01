@@ -1,10 +1,22 @@
-context("test gbifdb")
+Sys.setenv("GBIF_HOME"=tempdir())
+
 
 test_that("gbif_example_data()", {
 
   path <- gbif_example_data()
   expect_true(dir.exists(path))
 
+})
+
+test_that("gbif_conn() duckdb", {
+  
+  skip_on_os("solaris")
+  path <- gbif_example_data()
+  conn <- gbif_conn(path, backend="duckdb")
+  
+  expect_true(dir.exists(path))
+  expect_true(inherits(conn, "duckdb_connection"))
+  
 })
 
 test_that("gbif_conn()", {
@@ -16,6 +28,18 @@ test_that("gbif_conn()", {
   expect_true(dir.exists(path))
   expect_true(inherits(conn, "duckdb_connection"))
 
+})
+
+test_that("gbif_local()", {
+  
+  skip_on_os("solaris")
+  path <- gbif_example_data()
+  gbif <- gbif_local(path)
+  
+  expect_true(inherits(gbif, "tbl"))
+  expect_true(inherits(gbif, "tbl_dbi"))
+  expect_true(inherits(gbif, "tbl_duckdb_connection"))
+  
 })
 
 test_that("gbif_dir()", {
@@ -33,23 +57,24 @@ test_that("gbif_remote()", {
   skip_if_not(has_s3)
 
   conn <- gbif_remote(to_duckdb = FALSE)
-  expect_true(inherits(conn, "Dataset"))
+  expect_true(inherits(conn, "arrow_dplyr_query"))
+  #expect_true(inherits(conn, "Dataset"))
 })
 
 test_that("gbif_remote(to_duckdb=TRUE)....slow!", {
 
-  skip("CI strangeness")
-
+  skip_if_offline()
+  skip_on_cran()
+  skip_on_ci()
+  
   info <- arrow::arrow_info()
   has_s3 <- info$capabilities[["s3"]]
   skip_if_not(has_s3)
 
-  skip_if_offline()
-  skip_on_cran()
-  
+  skip("memory not mapped segfault")
 
-  library(arrow)
-  library(dplyr)
+  library(arrow, quietly = TRUE)
+  library(dplyr, quietly = TRUE)
   conn <- gbif_remote(to_duckdb = TRUE)
   expect_true(inherits(conn, "tbl_dbi"))
   duckdb::dbDisconnect(conn$src$con, shutdown = TRUE)
