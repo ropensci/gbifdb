@@ -7,7 +7,7 @@
 gbif_remote(
   version = gbif_version(),
   bucket = gbif_default_bucket(),
-  to_duckdb = FALSE,
+  to_duckdb = TRUE,
   safe = TRUE,
   ...
 )
@@ -18,14 +18,21 @@ gbif_remote(
 \item{bucket}{GBIF bucket name (including region)}
 
 \item{to_duckdb}{Return a remote duckdb connection or arrow connection?
-Note that leaving as FALSE may be faster but is limited to the dplyr-style
+Note that setting to FALSE may be faster but is limited to the dplyr-style
 operations supported by \link{arrow} alone.}
 
-\item{safe}{logical, default TRUE.  Should we exclude columns \verb{mediatype`` and }issue`?
+\item{safe}{logical, default TRUE.  Should we exclude columns \code{mediatype} and \code{issue}?
 varchar datatype on these columns substantially slows downs queries.}
 
 \item{...}{additional parameters passed to the s3_bucket() (e.g. for remote
 access to independently hosted buckets)}
+}
+\value{
+a remote tibble \code{tbl_sql} class object (by deafult), or a arrow
+Dataset query if \code{to_duckdb} is FALSE.  In either case, users should call
+\verb{[dplyr::collect]} on the final result to force evaluation and bring the
+resulting data into
+memory in R.
 }
 \description{
 Connect to GBIF remote directly. Can be much faster than downloading
@@ -36,6 +43,9 @@ as the data. See Details.
 Query performance is dramatically improved in queries that return only
 a subset of columns. Consider using explicit \code{select()} commands to return only
 the columns you need.
+
+A summary of this GBIF data, along with column meanings can be found at
+\url{https://github.com/gbif/occurrence/blob/master/aws-public-data.md}
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

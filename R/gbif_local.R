@@ -6,6 +6,9 @@
 #' @param safe logical, default TRUE.  Should we exclude columns `mediatype`` and `issue`?
 #' varchar datatype on these columns substantially slows downs queries.
 #' @return a remote tibble `tbl_sql` class object
+#' @details 
+#' A summary of this GBIF data, along with column meanings can be found at 
+#' <https://github.com/gbif/occurrence/blob/master/aws-public-data.md>
 #' @export
 #' @examplesIf interactive()
 #' 

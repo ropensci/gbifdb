@@ -2,6 +2,7 @@
 #' Download GBIF data using aws.s3 sync
 #' 
 #' Sync a local directory with selected release of the AWS copy of GBIF
+
 #' @param version Release date (YYYY-MM-DD) which should be synced. Will
 #' detect latest version by default.  
 #' @param dir path to local directory where parquet files should be stored.
@@ -11,7 +12,6 @@
 #' compute location for improved performance, e.g. European researchers may
 #' prefer "gbif-open-data-eu-central-1" etc.
 #' @param region bucket region (usually ignored? Just set the bucket appropriately)
-#' 
 #' @details
 #' Sync parquet files from GBIF public data catalogue,
 #' https://registry.opendata.aws/gbif/. 
@@ -22,6 +22,9 @@
 #' 
 #' Also, some users may prefer to download this data using an alternative
 #' interface or work on a cloud-host machine where data is already available.
+#' Note, these data include all CC0 and CC-BY licensed data in GBIF that have
+#'coordinates which passed automated quality checks,
+#' see <https://github.com/gbif/occurrence/blob/master/aws-public-data.md>.
 #' @export
 #' 
 #' @examplesIf interactive()
