@@ -48,7 +48,6 @@ cachable_duckdb_conn <- function(){
 
 
 ## Pure duckdb -- currently crashes if all columns are selected
-## Currently not used!
 gbif_conn_duckdb <- function(dir, 
                              tblname = "gbif") {
   parquet <- file.path(dir, "*")
