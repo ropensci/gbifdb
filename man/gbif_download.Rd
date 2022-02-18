@@ -6,7 +6,7 @@
 \usage{
 gbif_download(
   version = gbif_version(),
-  dir = gbif_parquet_dir(version),
+  dir = gbif_dir(),
   bucket = gbif_default_bucket(),
   region = "us-east-1"
 )
