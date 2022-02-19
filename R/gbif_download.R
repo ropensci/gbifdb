@@ -32,22 +32,30 @@
 #' 
 gbif_download <-
   function(version = gbif_version(),
-           dir = gbif_parquet_dir(version),
+           dir = gbif_dir(),
            bucket = gbif_default_bucket(),
            region = "us-east-1"
            ){
 
-  if(!requireNamespace("aws.s3", quietly = TRUE)){
+  if (!requireNamespace("aws.s3", quietly = TRUE)) {
     message("the aws.s3 package is required for automatic download")
     return(invisible(NULL))
   }
+  parquet_dir <- gbif_parquet_dir(version, dir)
+  if (!exists(parquet_dir)) {
+    dir.create(parquet_dir, FALSE, TRUE)
+  }
+    
   ## Public access fails if user has a secret key configured
   unset_aws_env()
   
   ## Consider sync via arrow instead?  (very low level interface tho)
-  aws.s3::s3sync(dir,
+  ## Consider {paws} <https://cran.r-project.org/web/packages/paws/>
+  aws.s3::s3sync(parquet_dir,
                  base_url = "s3.amazonaws.com",
+                 direction = "download",
                  bucket = bucket,
-                 prefix = version,
-                 region = region)
+                 prefix = paste0("occurrence/", version, "/occurrence.parquet"),
+                 region = region,
+                 verbose = FALSE)
 }
