@@ -7,7 +7,7 @@
 gbif_remote(
   version = gbif_version(),
   bucket = gbif_default_bucket(),
-  to_duckdb = TRUE,
+  to_duckdb = FALSE,
   safe = TRUE,
   ...
 )
@@ -17,9 +17,7 @@ gbif_remote(
 
 \item{bucket}{GBIF bucket name (including region)}
 
-\item{to_duckdb}{Return a remote duckdb connection or arrow connection?
-Note that setting to FALSE may be faster but is limited to the dplyr-style
-operations supported by \link{arrow} alone.}
+\item{to_duckdb}{Return a remote duckdb connection or arrow connection?}
 
 \item{safe}{logical, default TRUE.  Should we exclude columns \code{mediatype} and \code{issue}?
 varchar datatype on these columns substantially slows downs queries.}

@@ -7,7 +7,7 @@
 gbif_local(
   dir = gbif_parquet_dir(version = gbif_version(local = TRUE)),
   tblname = "gbif",
-  backend = "arrow",
+  backend = "duckdb",
   safe = TRUE
 )
 }
