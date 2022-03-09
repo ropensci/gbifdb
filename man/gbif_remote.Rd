@@ -26,7 +26,7 @@ varchar datatype on these columns substantially slows downs queries.}
 access to independently hosted buckets)}
 }
 \value{
-a remote tibble \code{tbl_sql} class object (by deafult), or a arrow
+a remote tibble \code{tbl_sql} class object (by default), or a arrow
 Dataset query if \code{to_duckdb} is FALSE.  In either case, users should call
 \verb{[dplyr::collect]} on the final result to force evaluation and bring the
 resulting data into
