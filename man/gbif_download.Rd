@@ -29,9 +29,8 @@ prefer "gbif-open-data-eu-central-1" etc.}
 Sync a local directory with selected release of the AWS copy of GBIF
 }
 \details{
-Sync parquet files from GBIF public data catalogue,
+Sync parquet files from GBIF public data catalog,
 https://registry.opendata.aws/gbif/.
-Setting a bucket t
 
 Note that data can also be found on the Microsoft Cloud,
 https://planetarycomputer.microsoft.com/dataset/gbif

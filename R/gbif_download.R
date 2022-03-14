@@ -13,9 +13,9 @@
 #' prefer "gbif-open-data-eu-central-1" etc.
 #' @param region bucket region (usually ignored? Just set the bucket appropriately)
 #' @details
-#' Sync parquet files from GBIF public data catalogue,
+#' Sync parquet files from GBIF public data catalog,
 #' https://registry.opendata.aws/gbif/. 
-#' Setting a bucket t
+#' 
 #' 
 #' Note that data can also be found on the Microsoft Cloud,
 #' https://planetarycomputer.microsoft.com/dataset/gbif
@@ -47,12 +47,14 @@ gbif_download <-
   }
     
   ## Public access fails if user has a secret key configured
-  unset_aws_env()
+  
+  if (getOption("gbif_unset_aws", TRUE)) unset_aws_env()
+  
   
   ## Consider sync via arrow instead?  (very low level interface tho)
   ## Consider {paws} <https://cran.r-project.org/web/packages/paws/>
   aws.s3::s3sync(parquet_dir,
-                 base_url = "s3.amazonaws.com",
+                 base_url = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
                  direction = "download",
                  bucket = bucket,
                  prefix = paste0("occurrence/", version, "/occurrence.parquet"),

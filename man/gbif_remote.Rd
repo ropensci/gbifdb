@@ -9,18 +9,28 @@ gbif_remote(
   bucket = gbif_default_bucket(),
   to_duckdb = FALSE,
   safe = TRUE,
+  unset_aws = getOption("gbif_unset_aws", TRUE),
+  endpoint_override = Sys.getenv("AWS_S3_ENDPOINT"),
   ...
 )
 }
 \arguments{
 \item{version}{GBIF snapshot date}
 
-\item{bucket}{GBIF bucket name (including region)}
+\item{bucket}{GBIF bucket name (including region). A default can also be set using
+the option \code{gbif_default_bucket}, see \link{options}.}
 
 \item{to_duckdb}{Return a remote duckdb connection or arrow connection?}
 
 \item{safe}{logical, default TRUE.  Should we exclude columns \code{mediatype} and \code{issue}?
 varchar datatype on these columns substantially slows downs queries.}
+
+\item{unset_aws}{Unset AWS credentials?  GBIF is provided in a public bucket,
+so credentials are not needed, but having a AWS_ACCESS_KEY_ID or other AWS
+environmental variables set can cause the connection to fail.  By default,
+this will unset any set environmental variables for the duration of the R session.
+This behavior can also be turned off globally by setting the option
+\code{gbif_unset_aws} to FALSE (e.g. to use an alternative network endpoint)}
 
 \item{...}{additional parameters passed to the s3_bucket() (e.g. for remote
 access to independently hosted buckets)}
