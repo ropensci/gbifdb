@@ -34,7 +34,7 @@ gbif_download <-
   function(version = gbif_version(),
            dir = gbif_dir(),
            bucket = gbif_default_bucket(),
-           region = "us-east-1"
+           region = ""
            ){
 
   if (!requireNamespace("aws.s3", quietly = TRUE)) {

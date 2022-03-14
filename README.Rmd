@@ -79,13 +79,13 @@ library(dplyr)  # optional, for dplyr-based operations
 
 To begin working with GBIF data directly without downloading the data first, simply establish a remote connection using `gbif_remote()`.
 
-```{r}
+```{r remote1}
 gbif <- gbif_remote()
 ```
 
 We can now perform most `dplyr` operations:
 
-```{r}
+```{r remote2}
 gbif %>%
   filter(phylum == "Chordata", year > 1990) %>%
   count(class, year) %>%
@@ -116,7 +116,7 @@ This requires over 100 GB free disk space, and will be a time-consuming process 
 However, once downloaded, future queries will run much much faster, particularly if you are network-limited.
 Users can download the current release of GBIF to local storage like so:
 
-```{r}
+```{r download, results="hide"}
 gbif_download()
 ```
 
@@ -127,18 +127,18 @@ or providing the path to the directory containing the parquet files directly.
 Once you have downloaded the parquet-formatted GBIF data, 
 `gbif_local()` will establish a connection to these local parquet files. 
 
-```{r}  
+```{r local}  
 gbif <- gbif_local()
 gbif
 ```
 
-```{r}
+```{r colnames}
 colnames(gbif)
 ```
 
 Now, we can use `dplyr` to perform standard queries: 
 
-```{r}
+```{r growth}
 growth <- gbif %>%
   filter(phylum == "Chordata", year > 1990) %>%
   count(class, year) %>% arrange(year)
@@ -150,7 +150,7 @@ This is fine for any further operations using `dplyr`/`tidyr` functions which ca
 Using such functions we can usually reduce our resulting table to something much smaller, 
 which can then be pulled into memory in R for further analysis using `collect()`:
 
-```{r}
+```{r plot}
 library(ggplot2)
 library(forcats)
 # GBIF: the global bird information facility?
