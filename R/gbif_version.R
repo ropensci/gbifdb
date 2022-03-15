@@ -12,7 +12,7 @@
 #' ## Latest local version available:
 #' gbif_version(local=TRUE)
 #' ## default version
-#' options(gbif_default_version="2021-01-01")))
+#' options(gbif_default_version="2021-01-01")
 #' gbif_version()
 #' @examplesIf interactive()
 #' ## Latest online version available:

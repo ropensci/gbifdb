@@ -33,7 +33,7 @@ A default version can be set using option \code{gbif_default_version}
 ## Latest local version available:
 gbif_version(local=TRUE)
 ## default version
-options(gbif_default_version="2021-01-01")))
+options(gbif_default_version="2021-01-01")
 gbif_version()
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 ## Latest online version available:

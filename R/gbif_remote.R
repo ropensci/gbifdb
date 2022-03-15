@@ -21,8 +21,8 @@
 #' this will unset any set environmental variables for the duration of the R session.
 #' This behavior can also be turned off globally by setting the option
 #' `gbif_unset_aws` to FALSE (e.g. to use an alternative network endpoint)
-#' @param ... additional parameters passed to the s3_bucket() (e.g. for remote
-#'  access to independently hosted buckets)
+#' @param endpoint_override optional parameter to [arrow::s3_bucket()]
+#' @param ... additional parameters passed to the [arrow::s3_bucket()]
 #' @return a remote tibble `tbl_sql` class object (by default), or a arrow 
 #' Dataset query if `to_duckdb` is FALSE.  In either case, users should call
 #'  `[dplyr::collect]` on the final result to force evaluation and bring the

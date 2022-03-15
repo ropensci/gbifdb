@@ -8,7 +8,7 @@ gbif_download(
   version = gbif_version(),
   dir = gbif_dir(),
   bucket = gbif_default_bucket(),
-  region = "us-east-1"
+  region = ""
 )
 }
 \arguments{
