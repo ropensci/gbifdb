@@ -43,7 +43,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -88,12 +88,37 @@
 
     
     
-<p>The goal of <code>gbifdb</code> is to provide a relational database interface to a <code>parquet</code> based serializations of <code>gbif</code> data. Instead of requiring custom functions for filtering and selecting data from the central GBIF server (as in <code>rgbif</code>), <code>gbifdb</code> users can take advantage of the full array of <code>dplyr</code> and <code>tidyr</code> functions which can be automatically translated to SQL by <code>dbplyr</code>. Users already familiar with SQL can construct SQL queries directly with <code>DBI</code> instead. <code>gbifdb</code> sends these queries to <a href="https://duckdb.org" class="external-link"><code>duckdb</code></a>, a high-performance, columnar-oriented database engine which runs entirely inside the client, (unlike server-client databases such as MySQL or Postgres, no additional setup is needed outside of installing <code>gbifdb</code>.) <code>duckdb</code> is able to execute these SQL queries directly on-disk against the Parquet data files, side-stepping limitations of available RAM or the need to import the data. It’s highly optimized implementation can be faster even than in-memory operations in <code>dplyr</code>. <code>duckdb</code> supports the full set of SQL instructions, including windowed operations like <code>group_by</code>+<code>summarise</code> as well as table joins.</p>
-<p><code>gbifdb</code> has two mechanisms for providing database connections: one which the Parquet snapshot of GBIF must first be downloaded locally, and a second where the GBIF parquet snapshot can be accessed directly from an Amazon Public Data Registry S3 bucket without downloading a copy. The latter approach will be faster for one-off operations and is also suitable when using a cloud-based computing provider in the same region.</p>
+<p>The goal of <code>gbifdb</code> is to provide a relational database
+interface to a <code>parquet</code> based serializations of
+<code>gbif</code> data. Instead of requiring custom functions for
+filtering and selecting data from the central GBIF server (as in
+<code>rgbif</code>), <code>gbifdb</code> users can take advantage of the
+full array of <code>dplyr</code> and <code>tidyr</code> functions which
+can be automatically translated to SQL by <code>dbplyr</code>. Users
+already familiar with SQL can construct SQL queries directly with
+<code>DBI</code> instead. <code>gbifdb</code> sends these queries to <a href="https://duckdb.org" class="external-link"><code>duckdb</code></a>, a high-performance,
+columnar-oriented database engine which runs entirely inside the client,
+(unlike server-client databases such as MySQL or Postgres, no additional
+setup is needed outside of installing <code>gbifdb</code>.)
+<code>duckdb</code> is able to execute these SQL queries directly
+on-disk against the Parquet data files, side-stepping limitations of
+available RAM or the need to import the data. It’s highly optimized
+implementation can be faster even than in-memory operations in
+<code>dplyr</code>. <code>duckdb</code> supports the full set of SQL
+instructions, including windowed operations like
+<code>group_by</code>+<code>summarise</code> as well as table joins.</p>
+<p><code>gbifdb</code> has two mechanisms for providing database
+connections: one which the Parquet snapshot of GBIF must first be
+downloaded locally, and a second where the GBIF parquet snapshot can be
+accessed directly from an Amazon Public Data Registry S3 bucket without
+downloading a copy. The latter approach will be faster for one-off
+operations and is also suitable when using a cloud-based computing
+provider in the same region.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p><strong>NOTE</strong>: <code>gbifdb</code> currently requires the dev version of <code>duckdb</code>, which you can install using:</p>
+<p><strong>NOTE</strong>: <code>gbifdb</code> currently requires the dev
+version of <code>duckdb</code>, which you can install using:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"https://github.com/duckdb/duckdb/releases/download/master-builds/duckdb_r_src.tar.gz"</span>, repos <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
 <!--
@@ -109,7 +134,8 @@ install.packages("gbifdb")
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("devtools")</span>
 <span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"cboettig/gbifdb"</span><span class="op">)</span></code></pre></div>
-<p><code>gbifdb</code> has few dependencies: only <code>duckdb</code> and <code>DBI</code> are required.</p>
+<p><code>gbifdb</code> has few dependencies: only <code>duckdb</code>
+and <code>DBI</code> are required.</p>
 </div>
 <div class="section level2">
 <h2 id="getting-started">Getting Started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
@@ -120,7 +146,9 @@ install.packages("gbifdb")
 <div class="section level3">
 <h3 id="remote-data-access">Remote data access<a class="anchor" aria-label="anchor" href="#remote-data-access"></a>
 </h3>
-<p>To begin working with GBIF data directly without downloading the data first, simply establish a remote connection using <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>.</p>
+<p>To begin working with GBIF data directly without downloading the data
+first, simply establish a remote connection using
+<code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gbif</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gbif_remote.html">gbif_remote</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p>We can now perform most <code>dplyr</code> operations:</p>
@@ -135,22 +163,54 @@ install.packages("gbifdb")
 <span class="co">#&gt; </span>
 <span class="co">#&gt; * Grouped by class</span>
 <span class="co">#&gt; See $.data for the source Arrow object</span></code></pre></div>
-<p>By default, this relies on an <code>arrow</code> connection, which currently lacks support for some more complex windowed operations in <code>dplyr</code>. A user can specify the option <code>to_duckdb = TRUE</code> in <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code> (or simply pass the connection to <code><a href="https://arrow.apache.org/docs/r//reference/to_duckdb.html" class="external-link">arrow::to_duckdb()</a></code>) to create a <code>duckdb</code> connection. This is slightly slower at this time. Keep in mind that as with any database connection, to use non-<code>dplyr</code> functions the user will generally need to call <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">dplyr::collect()</a></code>, which pulls the data into working memory.<br>
-Be sure to subset the data appropriately first (e.g. with <code>filter</code>, <code>summarise</code>, etc), as attempting to <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> a large table will probably exceed available RAM and crash your R session!</p>
-<p>When using a <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code> connection, all I/O operations will be conducted over the network storage instead of your local disk, without downloading the full dataset first. These operations will be considerably slower than they would be if you download the entire dataset first (see below, unless you are on an AWS cloud instance in the same region as the remote host), but this does avoid the download step all-together, which may be necessary if you do not have 100+ GB free storage space or the time to download the whole dataset first (e.g. for one-off queries).</p>
+<p>By default, this relies on an <code>arrow</code> connection, which
+currently lacks support for some more complex windowed operations in
+<code>dplyr</code>. A user can specify the option
+<code>to_duckdb = TRUE</code> in <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code> (or simply
+pass the connection to <code><a href="https://arrow.apache.org/docs/r/reference/to_duckdb.html" class="external-link">arrow::to_duckdb()</a></code>) to create a
+<code>duckdb</code> connection. This is slightly slower at this time.
+Keep in mind that as with any database connection, to use
+non-<code>dplyr</code> functions the user will generally need to call
+<code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">dplyr::collect()</a></code>, which pulls the data into working
+memory.<br>
+Be sure to subset the data appropriately first (e.g. with
+<code>filter</code>, <code>summarise</code>, etc), as attempting to
+<code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> a large table will probably exceed available RAM
+and crash your R session!</p>
+<p>When using a <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code> connection, all I/O
+operations will be conducted over the network storage instead of your
+local disk, without downloading the full dataset first. These operations
+will be considerably slower than they would be if you download the
+entire dataset first (see below, unless you are on an AWS cloud instance
+in the same region as the remote host), but this does avoid the download
+step all-together, which may be necessary if you do not have 100+ GB
+free storage space or the time to download the whole dataset first
+(e.g. for one-off queries).</p>
 </div>
 <div class="section level3">
 <h3 id="local-data">Local data<a class="anchor" aria-label="anchor" href="#local-data"></a>
 </h3>
-<p>For extended analysis of GBIF, users may prefer to download the entire GBIF parquet data first. This requires over 100 GB free disk space, and will be a time-consuming process the first time. However, once downloaded, future queries will run much much faster, particularly if you are network-limited. Users can download the current release of GBIF to local storage like so:</p>
+<p>For extended analysis of GBIF, users may prefer to download the
+entire GBIF parquet data first. This requires over 100 GB free disk
+space, and will be a time-consuming process the first time. However,
+once downloaded, future queries will run much much faster, particularly
+if you are network-limited. Users can download the current release of
+GBIF to local storage like so:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/gbif_download.html">gbif_download</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>By default, this will download to the dir given by <code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>.<br>
-An alternative directory can be set as an argument, or by setting the path in the environmental variable, <code>GBIF_HOME</code>.</p>
-<p>Once you have downloaded the parquet-formatted GBIF data, simply point <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> at the directory containing your parquet files to initialize a connection. (By default, <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> will look for data in the configurable directory given by <code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>).</p>
+<p>By default, this will download to the dir given by
+<code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>.<br>
+An alternative directory can be set as an argument, or by setting the
+path in the environmental variable, <code>GBIF_HOME</code>.</p>
+<p>Once you have downloaded the parquet-formatted GBIF data, simply
+point <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> at the directory containing your parquet
+files to initialize a connection. (By default, <code><a href="../reference/gbif_conn.html">gbif_conn()</a></code>
+will look for data in the configurable directory given by
+<code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">conn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/gbif_conn.html">gbif_conn</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>The resulting connection can be used with <code><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">dplyr::tbl()</a></code> to access the full gbif data:</p>
+<p>The resulting connection can be used with <code><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">dplyr::tbl()</a></code>
+to access the full gbif data:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">gbif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">conn</span>, <span class="st">"gbif"</span><span class="op">)</span>
 <span class="va">gbif</span>
@@ -225,9 +285,14 @@ An alternative directory can be set as an argument, or by setting the path in th
 <span class="co">#&gt;  9 Thaliacea           1991     669</span>
 <span class="co">#&gt; 10 Sarcopterygii       1991      13</span>
 <span class="co">#&gt; # … with more rows</span></code></pre></div>
-<p>Recall that when database connections in <code>dplyr</code>, the data remains in the database (i.e. on disk, not in working RAM).<br>
-This is fine for any further operations using <code>dplyr</code>/<code>tidyr</code> functions which can be translated into SQL.<br>
-Using such functions we can usually reduce our resulting table to something much smaller, which can then be pulled into memory in R for further analysis using <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code>:</p>
+<p>Recall that when database connections in <code>dplyr</code>, the data
+remains in the database (i.e. on disk, not in working RAM).<br>
+This is fine for any further operations using
+<code>dplyr</code>/<code>tidyr</code> functions which can be translated
+into SQL.<br>
+Using such functions we can usually reduce our resulting table to
+something much smaller, which can then be pulled into memory in R for
+further analysis using <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org" class="external-link">forcats</a></span><span class="op">)</span>
@@ -260,7 +325,8 @@ Using such functions we can usually reduce our resulting table to something much
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer>

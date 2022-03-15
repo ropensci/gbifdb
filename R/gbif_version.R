@@ -7,9 +7,13 @@
 #' @param all show all versions? (logical, default `FALSE`)
 #' @param ... additional arguments to [arrow::s3_bucket]
 #' @export
+#' @details A default version can be set using option `gbif_default_version`
 #' @examples
 #' ## Latest local version available:
 #' gbif_version(local=TRUE)
+#' ## default version
+#' options(gbif_default_version="2021-01-01")
+#' gbif_version()
 #' @examplesIf interactive()
 #' ## Latest online version available:
 #' gbif_version()
@@ -21,6 +25,10 @@ gbif_version <- function(local = FALSE,
                          bucket = gbif_default_bucket(),
                          all = FALSE,
                          ...) {
+  version <- getOption("gbif_default_version", NA)
+  if (!is.na(version)) { 
+    return(version)
+  }
   versions <- tryCatch(
     {
       if(local) {
@@ -45,9 +53,12 @@ latest_version <- function(versions) {
   )
 }
 
-remote_versions <- function(bucket = gbif_default_bucket(), ...) {
-  unset_aws_env()
-  s3 <- arrow::s3_bucket(bucket, ...)
+remote_versions <- function(bucket = gbif_default_bucket(), 
+                            endpoint_override = Sys.getenv("AWS_S3_ENDPOINT"),
+                            ...) {
+  
+  if (getOption("gbif_unset_aws", TRUE)) unset_aws_env()
+  s3 <- arrow::s3_bucket(bucket, endpoint_override=endpoint_override, ...)
   versions <- basename(s3$ls("occurrence"))
 }
 
@@ -58,5 +69,6 @@ local_versions <- function(path = gbif_dir()) {
 
 
 gbif_default_bucket <- function() {
-  "gbif-open-data-us-east-1"
+  getOption("gbif_default_bucket", "gbif-open-data-us-east-1")
+  
 }

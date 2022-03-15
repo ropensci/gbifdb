@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -59,17 +59,32 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.1" id="gbifdb-011">gbifdb 0.1.1<a class="anchor" aria-label="anchor" href="#gbifdb-011"></a></h2>
-<ul><li>Automatically detect latest release (see <code><a href="../reference/gbif_version.html">gbif_version()</a></code>). Works with local and remote sources, can also report all available versions.</li>
-<li>add <code><a href="../reference/gbif_local.html">gbif_local()</a></code> to return a remote table instead of a connection; paralleling the use of <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>
+<ul><li>Automatically detect latest release (see
+<code><a href="../reference/gbif_version.html">gbif_version()</a></code>). Works with local and remote sources, can
+also report all available versions.</li>
+<li>add <code><a href="../reference/gbif_local.html">gbif_local()</a></code> to return a remote table instead of a
+connection; paralleling the use of <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>
 </li>
 <li>
-<code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> (and thus <code><a href="../reference/gbif_local.html">gbif_local()</a></code> ) gain the ability to use arrow as a backend to duckdb, and this is now the default. This improves performance and avoids crashes when all columns are requested.</li>
-<li>default bucket set to “us-east-1” (across both <code><a href="../reference/gbif_download.html">gbif_download()</a></code> and <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>)</li>
+<code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> (and thus <code><a href="../reference/gbif_local.html">gbif_local()</a></code> ) gain
+the ability to use arrow as a backend to duckdb, and this is now the
+default. This improves performance and avoids crashes when all columns
+are requested.</li>
+<li>default bucket set to “us-east-1” (across both
+<code><a href="../reference/gbif_download.html">gbif_download()</a></code> and <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>)</li>
 <li>
-<code><a href="../reference/gbif_download.html">gbif_download()</a></code> now automatically detects versions, downloads parquet files to a path that parallels the remote path (using release-specific subdirectories), and allows bucket to be configured.</li>
-<li>set <code>to_duckdb=TRUE</code> by default in <code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>, creating a consistent lazy-table interface with support for windowed functions</li>
+<code><a href="../reference/gbif_download.html">gbif_download()</a></code> now automatically detects versions,
+downloads parquet files to a path that parallels the remote path (using
+release-specific subdirectories), and allows bucket to be
+configured.</li>
+<li>set <code>to_duckdb=TRUE</code> by default in
+<code><a href="../reference/gbif_remote.html">gbif_remote()</a></code>, creating a consistent lazy-table interface
+with support for windowed functions</li>
 <li>
-<code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> (and <code><a href="../reference/gbif_local.html">gbif_local()</a></code>) now automatically detect the path of most recent GBIF version in <code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>. No more need to to manually set path for <code>occurrence.parquet/</code> subfolder.</li>
+<code><a href="../reference/gbif_conn.html">gbif_conn()</a></code> (and <code><a href="../reference/gbif_local.html">gbif_local()</a></code>) now
+automatically detect the path of most recent GBIF version in
+<code><a href="../reference/gbif_dir.html">gbif_dir()</a></code>. No more need to to manually set path for
+<code>occurrence.parquet/</code> subfolder.</li>
 <li>documentation improved.</li>
 </ul></div>
   </div>
@@ -86,7 +101,8 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer></div>

@@ -28,7 +28,7 @@ as the data. See Details."><!-- mathjax --><script src="https://cdnjs.cloudflare
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,8 +70,10 @@ as the data. See Details.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">gbif_remote</span><span class="op">(</span>
   version <span class="op">=</span> <span class="fu"><a href="gbif_version.html">gbif_version</a></span><span class="op">(</span><span class="op">)</span>,
   bucket <span class="op">=</span> <span class="fu">gbif_default_bucket</span><span class="op">(</span><span class="op">)</span>,
-  to_duckdb <span class="op">=</span> <span class="cn">TRUE</span>,
+  to_duckdb <span class="op">=</span> <span class="cn">FALSE</span>,
   safe <span class="op">=</span> <span class="cn">TRUE</span>,
+  unset_aws <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"gbif_unset_aws"</span>, <span class="cn">TRUE</span><span class="op">)</span>,
+  endpoint_override <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"AWS_S3_ENDPOINT"</span><span class="op">)</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -81,21 +83,27 @@ as the data. See Details.</p>
     <dl><dt>version</dt>
 <dd><p>GBIF snapshot date</p></dd>
 <dt>bucket</dt>
-<dd><p>GBIF bucket name (including region)</p></dd>
+<dd><p>GBIF bucket name (including region). A default can also be set using
+the option <code>gbif_default_bucket</code>, see <a href="https://rdrr.io/r/base/options.html" class="external-link">options</a>.</p></dd>
 <dt>to_duckdb</dt>
-<dd><p>Return a remote duckdb connection or arrow connection?
-Note that setting to FALSE may be faster but is limited to the dplyr-style
-operations supported by <a href="https://rdrr.io/r/grid/arrow.html" class="external-link">arrow</a> alone.</p></dd>
+<dd><p>Return a remote duckdb connection or arrow connection?</p></dd>
 <dt>safe</dt>
 <dd><p>logical, default TRUE.  Should we exclude columns <code>mediatype</code> and <code>issue</code>?
 varchar datatype on these columns substantially slows downs queries.</p></dd>
+<dt>unset_aws</dt>
+<dd><p>Unset AWS credentials?  GBIF is provided in a public bucket,
+so credentials are not needed, but having a AWS_ACCESS_KEY_ID or other AWS
+environmental variables set can cause the connection to fail.  By default,
+this will unset any set environmental variables for the duration of the R session.
+This behavior can also be turned off globally by setting the option
+<code>gbif_unset_aws</code> to FALSE (e.g. to use an alternative network endpoint)</p></dd>
 <dt>...</dt>
 <dd><p>additional parameters passed to the s3_bucket() (e.g. for remote
 access to independently hosted buckets)</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>a remote tibble <code>tbl_sql</code> class object (by deafult), or a arrow
+    <p>a remote tibble <code>tbl_sql</code> class object (by default), or a arrow
 Dataset query if <code>to_duckdb</code> is FALSE.  In either case, users should call
 <code>[dplyr::collect]</code> on the final result to force evaluation and bring the
 resulting data into
@@ -131,7 +139,8 @@ the columns you need.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.2.</p>
 </div>
 
       </footer></div>

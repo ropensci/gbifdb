@@ -1,9 +1,9 @@
 CMD
 GBIF
+ORCID
 Postgres
 YYYY
 aws
-catalogue
 dev
 dir
 dplyr
@@ -11,7 +11,9 @@ duckdb
 env
 eu
 gbif
+github
 https
+md
 microsoft
 opendata
 planetarycomputer
@@ -19,3 +21,4 @@ rgbif
 subfolder
 tibble
 varchar
+’s

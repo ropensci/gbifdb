@@ -10,15 +10,20 @@
 #' a subset of columns. Consider using explicit `select()` commands to return only
 #' the columns you need.
 #' @param version GBIF snapshot date
-#' @param bucket GBIF bucket name (including region)
+#' @param bucket GBIF bucket name (including region). A default can also be set using
+#' the option `gbif_default_bucket`, see [options].
 #' @param to_duckdb Return a remote duckdb connection or arrow connection?
-#'   Note that setting to FALSE may be faster but is limited to the dplyr-style
-#'   operations supported by [arrow] alone.
 #' @param safe logical, default TRUE.  Should we exclude columns `mediatype` and `issue`?
 #' varchar datatype on these columns substantially slows downs queries.
-#' @param ... additional parameters passed to the s3_bucket() (e.g. for remote
-#'  access to independently hosted buckets)
-#' @return a remote tibble `tbl_sql` class object (by deafult), or a arrow 
+#' @param unset_aws Unset AWS credentials?  GBIF is provided in a public bucket,
+#' so credentials are not needed, but having a AWS_ACCESS_KEY_ID or other AWS
+#' environmental variables set can cause the connection to fail.  By default,
+#' this will unset any set environmental variables for the duration of the R session.
+#' This behavior can also be turned off globally by setting the option
+#' `gbif_unset_aws` to FALSE (e.g. to use an alternative network endpoint)
+#' @param endpoint_override optional parameter to [arrow::s3_bucket()]
+#' @param ... additional parameters passed to the [arrow::s3_bucket()]
+#' @return a remote tibble `tbl_sql` class object (by default), or a arrow 
 #' Dataset query if `to_duckdb` is FALSE.  In either case, users should call
 #'  `[dplyr::collect]` on the final result to force evaluation and bring the
 #'   resulting data into 
@@ -36,16 +41,20 @@
 gbif_remote <-
     function(version = gbif_version(),
              bucket = gbif_default_bucket(),
-             to_duckdb = TRUE,
+             to_duckdb = FALSE,
              safe = TRUE,
+             unset_aws = getOption("gbif_unset_aws", TRUE),
+             endpoint_override = Sys.getenv("AWS_S3_ENDPOINT"),
              ...) {
         if (!requireNamespace("arrow", quietly = TRUE)) {
             stop("please install arrow first")
         }
 
-        unset_aws_env()
+        if (unset_aws) {
+          unset_aws_env()
+        }
         server <-
-         arrow::s3_bucket(bucket, ...)
+         arrow::s3_bucket(bucket, endpoint_override = endpoint_override, ...)
         prefix <- 
           paste0("/occurrence/",
                  version,
