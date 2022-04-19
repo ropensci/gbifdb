@@ -26,11 +26,11 @@ Sys.setenv("GBIF_HOME"="/home/shared-data/gbif",
 # gbifdb
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/cboettig/gbifdb/workflows/R-CMD-check/badge.svg)](https://github.com/cboettig/gbifdb/actions)
+[![R-CMD-check](https://github.com/ropensci/gbifdb/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/gbifdb/actions)
+[![CRAN status](https://www.r-pkg.org/badges/version/gbifdb)](https://CRAN.R-project.org/package=gbifdb)
 <!-- badges: end -->
 
 The goal of `gbifdb` is to provide a relational database interface to a `parquet` based serializations of `gbif`'s AWS snapshots of its public data [^1].
-[^1]: all CC0 and CC-BY licensed data in GBIF that have coordinates which passed automated quality checks, [see GBIF docs]https://github.com/gbif/occurrence/blob/master/aws-public-data.md)
 Instead of requiring custom functions for filtering and selecting data from the central GBIF server (as in `rgbif`), `gbifdb` users can take advantage of the full array of `dplyr` and `tidyr` functions which can be automatically translated to SQL by `dbplyr`.
 Users already familiar with SQL can construct SQL queries directly with `DBI` instead. 
 `gbifdb` sends these queries to [`duckdb`](https://duckdb.org), a high-performance, columnar-oriented database engine which runs entirely inside the client,
@@ -38,6 +38,9 @@ Users already familiar with SQL can construct SQL queries directly with `DBI` in
 `duckdb` is able to execute these SQL queries directly on-disk against the Parquet data files, side-stepping limitations of available RAM or the need to import the data. 
 It's highly optimized implementation can be faster even than in-memory operations in `dplyr`.
 `duckdb` supports the full set of SQL instructions, including windowed operations like `group_by`+`summarise` as well as table joins.
+
+
+[^1]: all CC0 and CC-BY licensed data in GBIF that have coordinates which passed automated quality checks, [see GBIF docs]https://github.com/gbif/occurrence/blob/master/aws-public-data.md)
 
 `gbifdb` has two mechanisms for providing database connections: one which the Parquet snapshot of GBIF must first be downloaded locally, 
 and a second where the GBIF parquet snapshot can be accessed directly from an Amazon Public Data Registry S3 bucket without downloading a copy.
@@ -63,7 +66,7 @@ And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("cboettig/gbifdb")
+devtools::install_github("ropensci/gbifdb")
 ```
 
 `gbifdb` has few dependencies: `arrow`, `duckdb` and `DBI` are required.  
