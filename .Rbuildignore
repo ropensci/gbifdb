@@ -8,5 +8,5 @@
 ^docs$
 ^paper$
 codemeta.json
-
+^LICENSE$
 ^LICENSE\.md$
