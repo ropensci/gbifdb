@@ -5,29 +5,29 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/cboettig/gbifdb/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/gbifdb/actions)
+[![R-CMD-check](https://github.com/ropensci/gbifdb/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/gbifdb/actions)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/gbifdb)](https://CRAN.R-project.org/package=gbifdb)
 <!-- badges: end -->
 
 The goal of `gbifdb` is to provide a relational database interface to a
 `parquet` based serializations of `gbif`’s AWS snapshots of its public
-data \[^1\]. \[^1\]: all CC0 and CC-BY licensed data in GBIF that have
-coordinates which passed automated quality checks, \[see GBIF
-docs\]<https://github.com/gbif/occurrence/blob/master/aws-public-data.md>)
-Instead of requiring custom functions for filtering and selecting data
-from the central GBIF server (as in `rgbif`), `gbifdb` users can take
-advantage of the full array of `dplyr` and `tidyr` functions which can
-be automatically translated to SQL by `dbplyr`. Users already familiar
-with SQL can construct SQL queries directly with `DBI` instead. `gbifdb`
-sends these queries to [`duckdb`](https://duckdb.org), a
-high-performance, columnar-oriented database engine which runs entirely
-inside the client, (unlike server-client databases such as MySQL or
-Postgres, no additional setup is needed outside of installing `gbifdb`.)
-`duckdb` is able to execute these SQL queries directly on-disk against
-the Parquet data files, side-stepping limitations of available RAM or
-the need to import the data. It’s highly optimized implementation can be
-faster even than in-memory operations in `dplyr`. `duckdb` supports the
-full set of SQL instructions, including windowed operations like
-`group_by`+`summarise` as well as table joins.
+data [^1]. Instead of requiring custom functions for filtering and
+selecting data from the central GBIF server (as in `rgbif`), `gbifdb`
+users can take advantage of the full array of `dplyr` and `tidyr`
+functions which can be automatically translated to SQL by `dbplyr`.
+Users already familiar with SQL can construct SQL queries directly with
+`DBI` instead. `gbifdb` sends these queries to
+[`duckdb`](https://duckdb.org), a high-performance, columnar-oriented
+database engine which runs entirely inside the client, (unlike
+server-client databases such as MySQL or Postgres, no additional setup
+is needed outside of installing `gbifdb`.) `duckdb` is able to execute
+these SQL queries directly on-disk against the Parquet data files,
+side-stepping limitations of available RAM or the need to import the
+data. It’s highly optimized implementation can be faster even than
+in-memory operations in `dplyr`. `duckdb` supports the full set of SQL
+instructions, including windowed operations like `group_by`+`summarise`
+as well as table joins.
 
 `gbifdb` has two mechanisms for providing database connections: one
 which the Parquet snapshot of GBIF must first be downloaded locally, and
@@ -52,7 +52,7 @@ And the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("cboettig/gbifdb")
+devtools::install_github("ropensci/gbifdb")
 ```
 
 `gbifdb` has few dependencies: `arrow`, `duckdb` and `DBI` are required.
@@ -81,18 +81,18 @@ gbif %>%
   count(class, year) %>%
   collect()
 #> # A tibble: 461 × 3
-#>    class     year        n
-#>    <chr>    <int>    <int>
-#>  1 Mammalia  2019   357036
-#>  2 Amphibia  2016    54300
-#>  3 Aves      1993  2909760
-#>  4 Aves      2016 86862292
-#>  5 Aves      2001  6321959
-#>  6 Aves      1994  3110959
-#>  7 Aves      1997  3862252
-#>  8 Aves      2011 30081466
-#>  9 Mammalia  2014   605929
-#> 10 Reptilia  1999    37241
+#>    class           year       n
+#>    <chr>          <int>   <int>
+#>  1 Actinopterygii  2003  696289
+#>  2 Actinopterygii  2009 1152201
+#>  3 Elasmobranchii  2009   67477
+#>  4 Actinopterygii  2010 1348109
+#>  5 Elasmobranchii  2003   22638
+#>  6 Ascidiacea      2013    9151
+#>  7 Actinopterygii  2002  777535
+#>  8 Actinopterygii  2008 1311066
+#>  9 Elasmobranchii  2008   64769
+#> 10 Elasmobranchii  2002   21948
 #> # … with 451 more rows
 ```
 
@@ -130,7 +130,6 @@ to local storage like so:
 
 ``` r
 gbif_download()
-
 ```
 
 By default, this will download to the dir given by `gbif_dir()`.  
@@ -148,16 +147,16 @@ gbif
 #> # Database: duckdb_connection
 #>        gbifid datasetkey    occurrenceid kingdom phylum class order family genus
 #>         <dbl> <chr>         <chr>        <chr>   <chr>  <chr> <chr> <chr>  <chr>
-#>  1 1054620404 b42a2e9a-fba… 5dvj8642-38… Animal… Arthr… Inse… Cole… Carab… Amara
-#>  2 1054619415 b42a2e9a-fba… 5dvj8642-28… Animal… Arthr… Inse… Cole… Carab… Pter…
-#>  3 1054621736 b42a2e9a-fba… 5dvj8642-51… Animal… Arthr… Inse… Cole… Carab… Cara…
-#>  4 1054621735 b42a2e9a-fba… 5dvj8642-51… Animal… Arthr… Inse… Cole… Carab… Cara…
-#>  5 1054620405 b42a2e9a-fba… 5dvj8642-38… Animal… Arthr… Inse… Cole… Carab… Amara
-#>  6 1054619416 b42a2e9a-fba… 5dvj8642-28… Animal… Arthr… Inse… Cole… Carab… Pter…
-#>  7 1054621734 b42a2e9a-fba… 5dvj8642-51… Animal… Arthr… Inse… Cole… Carab… Cara…
-#>  8 1054620402 b42a2e9a-fba… 5dvj8642-38… Animal… Arthr… Inse… Cole… Carab… Amara
-#>  9 1054619417 b42a2e9a-fba… 5dvj8642-28… Animal… Arthr… Inse… Cole… Carab… Pter…
-#> 10 1054620403 b42a2e9a-fba… 5dvj8642-38… Animal… Arthr… Inse… Cole… Carab… Amara
+#>  1 1572326202 0e2c20a3-3c3… 7B3E9B63FF9… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  2 1572326211 0e2c20a3-3c3… 7B3E9B63FF8… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  3 1572326213 0e2c20a3-3c3… 7B3E9B63FF9… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  4 1572326222 0e2c20a3-3c3… 7B3E9B63FF8… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  5 1572326224 0e2c20a3-3c3… 7B3E9B63FF8… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  6 1572326210 0e2c20a3-3c3… 7B3E9B63FF9… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  7 1572326209 0e2c20a3-3c3… 7B3E9B63FF8… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  8 1572326215 0e2c20a3-3c3… 7B3E9B63FF8… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#>  9 1572326228 0e2c20a3-3c3… 7B3E9B63FF8… Animal… Arthr… <NA>  Aran… Capon… Medi…
+#> 10 1572326205 0e2c20a3-3c3… 7B3E9B63FF8… Animal… Arthr… <NA>  Aran… Capon… Medi…
 #> # … with more rows, and 39 more variables: species <chr>,
 #> #   infraspecificepithet <chr>, taxonrank <chr>, scientificname <chr>,
 #> #   verbatimscientificname <chr>, verbatimscientificnameauthorship <chr>,
@@ -206,18 +205,18 @@ growth
 #> # Database:   duckdb_connection
 #> # Groups:     class
 #> # Ordered by: year
-#>    class               year       n
-#>    <chr>              <int>   <dbl>
-#>  1 Aves                1991 3183184
-#>  2 Amphibia            1991   18443
-#>  3 Actinopterygii      1991  363791
-#>  4 Mammalia            1991  100931
-#>  5 Reptilia            1991   29806
-#>  6 Ascidiacea          1991    1602
-#>  7 Elasmobranchii      1991   17521
-#>  8 Cephalaspidomorphi  1991    1152
-#>  9 Holocephali         1991    1048
-#> 10 Leptocardii         1991      36
+#>    class               year      n
+#>    <chr>              <int>  <dbl>
+#>  1 Cephalaspidomorphi  1991   1152
+#>  2 Elasmobranchii      1991  17521
+#>  3 Ascidiacea          1991   1602
+#>  4 Thaliacea           1991    669
+#>  5 Amphibia            1991  18443
+#>  6 Sarcopterygii       1991     13
+#>  7 Leptocardii         1991     36
+#>  8 <NA>                1991    912
+#>  9 Actinopterygii      1991 363791
+#> 10 Holocephali         1991   1048
 #> # … with more rows
 ```
 
@@ -240,7 +239,30 @@ growth %>%
   ggtitle("GBIF observations of vertebrates by class")
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="100%" />
+<img src="man/figures/README-plot-1.png" width="100%" />
+
+## Visualizing all of GBIF
+
+Database operations such as rounding provide an easy way to “rasterize”
+the data for spatial visualizations. Here we quickly generate where
+color intensity reflects the logarithmic occurance count in that pixel:
+
+``` r
+library(terra)
+library(viridisLite)
+
+db <- gbif_local()
+df <- db |> mutate(latitude = round(decimallatitude,1),
+                   longitude = round(decimallongitude,1)) |> 
+  count(longitude, latitude) |> 
+  collect() |> 
+  mutate(n = log(n))
+
+r <- rast(df, crs="epsg:4326")
+plot(r, col= viridis(1e3), legend=FALSE, maxcell=6e6, colNA="black", axes=FALSE)
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
 ## Performance notes
 
@@ -248,3 +270,7 @@ Because `parquet` is a columnar-oriented dataset, performance can be
 improved by including a `select()` call at the end of a dplyr function
 chain to only return the columns you actually need. This can be
 particularly helpful on remote connections using `gbif_remote()`.
+
+[^1]: all CC0 and CC-BY licensed data in GBIF that have coordinates
+    which passed automated quality checks, \[see GBIF
+    docs\]<https://github.com/gbif/occurrence/blob/master/aws-public-data.md>)

@@ -14,12 +14,15 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 
+Sys.unsetenv("AWS_ACCESS_KEY_ID")
+Sys.unsetenv("AWS_SECRET_ACCESS_KEY")
+
 ## Use local gbif copy
 options(gbif_unset_aws=FALSE, 
         gbif_default_bucket="gbif",
         gbif_default_version="2021-11-01")
 Sys.setenv("GBIF_HOME"="/home/shared-data/gbif",
-           AWS_S3_ENDPOINT = "minio.thelio.carlboettiger.info")
+           AWS_S3_ENDPOINT = "minio.carlboettiger.info")
 
 ```
 
@@ -40,7 +43,8 @@ It's highly optimized implementation can be faster even than in-memory operation
 `duckdb` supports the full set of SQL instructions, including windowed operations like `group_by`+`summarise` as well as table joins.
 
 
-[^1]: all CC0 and CC-BY licensed data in GBIF that have coordinates which passed automated quality checks, [see GBIF docs]https://github.com/gbif/occurrence/blob/master/aws-public-data.md)
+[^1]: all CC0 and CC-BY licensed data in GBIF that have coordinates which passed automated quality checks,
+[see GBIF docs]https://github.com/gbif/occurrence/blob/master/aws-public-data.md)
 
 `gbifdb` has two mechanisms for providing database connections: one which the Parquet snapshot of GBIF must first be downloaded locally, 
 and a second where the GBIF parquet snapshot can be accessed directly from an Amazon Public Data Registry S3 bucket without downloading a copy.
@@ -164,6 +168,26 @@ growth %>%
   ggtitle("GBIF observations of vertebrates by class")
 ```
 
+
+## Visualizing all of GBIF
+
+Database operations such as rounding provide an easy way to "rasterize" the data for spatial visualizations.
+Here we quickly generate where color intensity reflects the logarithmic occurance count in that pixel:
+
+```{r}
+library(terra)
+library(viridisLite)
+
+db <- gbif_local()
+df <- db |> mutate(latitude = round(decimallatitude,1),
+                   longitude = round(decimallongitude,1)) |> 
+  count(longitude, latitude) |> 
+  collect() |> 
+  mutate(n = log(n))
+
+r <- rast(df, crs="epsg:4326")
+plot(r, col= viridis(1e3), legend=FALSE, maxcell=6e6, colNA="black", axes=FALSE)
+```
 
 ## Performance notes
 
