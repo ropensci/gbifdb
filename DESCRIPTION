@@ -35,7 +35,7 @@ Suggests:
     knitr,
     rmarkdown,
     aws.s3
-URL:  https://docs.ropensci.org/gbifdb (website) https://github.com/ropensci/gbifdb
+URL:  https://docs.ropensci.org/gbifdb/ (website) https://github.com/ropensci/gbifdb
 BugReports: https://github.com/ropensci/gbifdb
 Language: en-US
 Roxygen: list(markdown = TRUE)
