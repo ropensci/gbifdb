@@ -18,7 +18,7 @@ Authors@R: c(
             person("Carl", "Boettiger", , "cboettig@gmail.com", c("aut", "cre"),
                    comment = c(ORCID = "0000-0002-1642-628X"))
             )
-License: MIT + file LICENSE
+License: Apache License (>= 2)
 Encoding: UTF-8
 ByteCompile: true
 Depends: R (>= 4.0)
@@ -35,7 +35,7 @@ Suggests:
     knitr,
     rmarkdown,
     aws.s3
-URL:  https://docs.ropensci.org/gbifdb/ (website) https://github.com/ropensci/gbifdb
+URL: https://docs.ropensci.org/gbifdb/ (website) https://github.com/ropensci/gbifdb
 BugReports: https://github.com/ropensci/gbifdb
 Language: en-US
 Roxygen: list(markdown = TRUE)
