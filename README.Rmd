@@ -172,7 +172,7 @@ growth %>%
 ## Visualizing all of GBIF
 
 Database operations such as rounding provide an easy way to "rasterize" the data for spatial visualizations.
-Here we quickly generate where color intensity reflects the logarithmic occurance count in that pixel:
+Here we quickly generate where color intensity reflects the logarithmic occurrence count in that pixel:
 
 ```{r}
 library(terra)

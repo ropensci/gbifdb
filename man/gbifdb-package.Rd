@@ -4,7 +4,7 @@
 \name{gbifdb-package}
 \alias{gbifdb}
 \alias{gbifdb-package}
-\title{gbifdb: Local Database Interface to 'GBIF'}
+\title{gbifdb: High Performance Interface to 'GBIF'}
 \description{
 A high performance interface to the Global Biodiversity Information Facility, 'GBIF'. In contrast to 'rgbif', which can access small subsets of 'GBIF' data through web-based queries to a central server, 'gbifdb' provides enhanced performance for R users performing large-scale analyses on servers and cloud computing providers, providing full support for arbitrary 'SQL' or 'dplyr' operations on the complete 'GBIF' data tables (now over 1 billion records, and over a terabyte in size). 'gbifdb' accesses a copy of the 'GBIF' data in 'parquet' format, which is already readily available in commercial computing clouds such as the Amazon Open Data portal and the Microsoft Planetary Computer, or can be accessed directly without downloading, or downloaded to any server with suitable bandwidth and storage space.
 }
