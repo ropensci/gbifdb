@@ -11,7 +11,7 @@ A high performance interface to the Global Biodiversity Information Facility, 'G
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/ropensci/gbifdb}
+  \item \url{https://docs.ropensci.org/gbifdb/ (website) https://github.com/ropensci/gbifdb}
   \item Report bugs at \url{https://github.com/ropensci/gbifdb}
 }
 
