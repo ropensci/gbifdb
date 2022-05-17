@@ -11,3 +11,4 @@ codemeta.json
 ^LICENSE$
 ^LICENSE\.md$
 ^CRAN-SUBMISSION$
+^cran-comments\.md$
