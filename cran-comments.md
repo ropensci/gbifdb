@@ -35,6 +35,5 @@ package directory and getwd()). This is not allowed by CRAN policies.
 Please omit any default path in writing functions. In your
 examples/vignettes/tests you can write to tempdir().
 
-I confirm we have already done this as advised by CRAN;
-all tests write to tempdir(). Examples and vignettes will not write to the
-user's home space when run as part of the R CMD check, test, etc.
+I again confirm we have already done this as advised by CRAN.
+Please provide specifics if you observe anything to the contrary.
