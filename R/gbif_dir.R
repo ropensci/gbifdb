@@ -3,7 +3,8 @@
 #'
 #' Default location can be set with the env var GBIF_HOME,
 #' otherwise will use the default provided by [tools::R_user_dir()]
-#'
+#' 
+#' @return path to the gbif home directory directory
 #' @export
 #' @examples 
 #' gbif_dir()
