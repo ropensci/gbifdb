@@ -23,6 +23,9 @@ gbif_version(
 
 \item{...}{additional arguments to \link[arrow:s3_bucket]{arrow::s3_bucket}}
 }
+\value{
+latest available gbif version, string
+}
 \description{
 Can also return latest locally downloaded version, or list all versions
 }

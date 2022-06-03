@@ -8,6 +8,7 @@
 #' @param ... additional arguments to [arrow::s3_bucket]
 #' @export
 #' @details A default version can be set using option `gbif_default_version`
+#' @return latest available gbif version, string
 #' @examples
 #' ## Latest local version available:
 #' gbif_version(local=TRUE)

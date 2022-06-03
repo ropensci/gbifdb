@@ -14,6 +14,9 @@ Description: A high performance interface to the Global Biodiversity
   Data portal and the Microsoft Planetary Computer, or can be 
   accessed directly without downloading, or downloaded
   to any server with suitable bandwidth and storage space.
+  The high-performance techniques for local and remote access 
+  are described in <https://duckdb.org/why_duckdb>
+  and <https://arrow.apache.org/docs/r/articles/fs.html> respectively.
 Authors@R: c(
             person("Carl", "Boettiger", , "cboettig@gmail.com", c("aut", "cre"),
                    comment = c(ORCID = "0000-0002-1642-628X"))

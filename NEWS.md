@@ -1,3 +1,8 @@
+# gbifdb 0.1.2
+
+* include links in DESCRIPTION to the unpublished methods implemented in arrow and duckdb for high-performance access.
+* update documentation to include return value on all exported functions.
+
 # gbifdb 0.1.1
 
 * Automatically detect latest release (see `gbif_version()`). Works with local and remote sources, can also report all available versions.

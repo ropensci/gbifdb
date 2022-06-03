@@ -6,6 +6,9 @@
 \usage{
 gbif_dir()
 }
+\value{
+path to the gbif home directory directory
+}
 \description{
 Default location can be set with the env var GBIF_HOME,
 otherwise will use the default provided by \code{\link[tools:userdir]{tools::R_user_dir()}}

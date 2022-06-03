@@ -6,6 +6,9 @@
 \usage{
 gbif_example_data()
 }
+\value{
+path to the example occurrence data installed with the package.
+}
 \description{
 Return a path to the directory containing GBIF example parquet data
 }

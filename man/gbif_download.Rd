@@ -25,6 +25,9 @@ prefer "gbif-open-data-eu-central-1" etc.}
 
 \item{region}{bucket region (usually ignored? Just set the bucket appropriately)}
 }
+\value{
+logical indicating success or failure.
+}
 \description{
 Sync a local directory with selected release of the AWS copy of GBIF
 }

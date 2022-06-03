@@ -27,6 +27,7 @@
 #' see <https://github.com/gbif/occurrence/blob/master/aws-public-data.md>.
 #' @export
 #' 
+#' @return logical indicating success or failure.
 #' @examplesIf interactive()
 #' gbif_download()
 #' 
