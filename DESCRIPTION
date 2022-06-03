@@ -1,5 +1,5 @@
 Package: gbifdb
-Version: 0.1.1
+Version: 0.1.2
 Title: High Performance Interface to 'GBIF'
 Description: A high performance interface to the Global Biodiversity
   Information Facility, 'GBIF'.  In contrast to 'rgbif', which can
@@ -23,8 +23,8 @@ Encoding: UTF-8
 ByteCompile: true
 Depends: R (>= 4.0)
 Imports:
-    arrow (>= 6.0.1),
-    duckdb (>= 0.2.9),
+    arrow (>= 8.0.0),
+    duckdb (>= 0.3.2),
     DBI,
     dplyr
 Suggests:
