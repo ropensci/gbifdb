@@ -1,11 +1,13 @@
-citHeader("To cite gbifdb in publications use:")
+citHeader("To cite gbifdb in publications, please include the DOI of the relevant snapshot (see https://www.gbif.org/occurrence-snapshots) in the citation. For analyses where data are significantly filtered, please track the datasetKeys used and use a derived dataset record for citing the data. Refer to https://www.gbif.org/citation-guidelines#cloud for details. 
+
+. ")
 
 citEntry(
   entry    = "misc",
   title    = paste("Global Biodiversity Information Facility (GBIF)
                    Species Occurrences"),
   year     = "2021",
-  url      = "https://registry.opendata.aws/gbif",
+  url      = "<doi>",
   textVersion = paste("Global Biodiversity Information Facility (GBIF) Species",
   "Occurrences was accessed on", Sys.Date(), 
   "from https://registry.opendata.aws/gbif.")
