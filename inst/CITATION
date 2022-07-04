@@ -3,11 +3,11 @@ citHeader("To cite gbifdb in publications, please include the DOI of the relevan
 citEntry(
   entry    = "misc",
   title    = paste("Global Biodiversity Information Facility (GBIF)
-                   Species Occurrences"),
+                   Species Occurrences via gbifdb package"),
   year     = "2021",
   url      = "<doi>",
   textVersion = paste("Global Biodiversity Information Facility (GBIF) Species",
-  "Occurrences was accessed on", Sys.Date(), 
+  "Occurrences was accessed via gbifdb on", Sys.Date(), 
   "from <DOI>.")
 
   )
