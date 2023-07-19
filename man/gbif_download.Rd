@@ -2,7 +2,7 @@
 % Please edit documentation in R/gbif_download.R
 \name{gbif_download}
 \alias{gbif_download}
-\title{Download GBIF data using aws.s3 sync}
+\title{Download GBIF data using minioclient}
 \usage{
 gbif_download(
   version = gbif_version(),

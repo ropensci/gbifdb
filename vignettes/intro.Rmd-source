@@ -117,20 +117,12 @@ By default, this will download to the dir given by `gbif_dir()`.
 An alternative directory can be set as an argument, or by setting the path in the environmental variable, `GBIF_HOME`.
 
 Once you have downloaded the parquet-formatted GBIF data, 
-simply point `gbif_conn()` at the directory containing your parquet files to initialize a connection.
-(By default, `gbif_conn()` will look for data in the configurable directory given by `gbif_dir()`).
+use point `gbif_local()` to access the lazy data frame.
 
 ```{r}
-conn <- gbif_conn()
+gbif <- gbif_local(backend="duckdb")
 ```
 
-
-The resulting connection can be used with `dplyr::tbl()` to access the full gbif data:
-
-```{r}  
-gbif <- tbl(conn, "gbif")
-gbif
-```
 
 ```{r}
 colnames(gbif)

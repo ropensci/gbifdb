@@ -8,27 +8,6 @@ test_that("gbif_example_data()", {
 
 })
 
-test_that("gbif_conn() duckdb", {
-  
-  skip_on_os("solaris")
-  path <- gbif_example_data()
-  conn <- gbif_conn(path, backend="duckdb")
-  
-  expect_true(dir.exists(path))
-  expect_true(inherits(conn, "duckdb_connection"))
-  
-})
-
-test_that("gbif_conn()", {
-  
-  skip_on_os("solaris")
-  path <- gbif_example_data()
-  conn <- gbif_conn(path)
-
-  expect_true(dir.exists(path))
-  expect_true(inherits(conn, "duckdb_connection"))
-
-})
 
 test_that("gbif_local()", {
   
@@ -61,21 +40,3 @@ test_that("gbif_remote()", {
   #expect_true(inherits(conn, "Dataset"))
 })
 
-test_that("gbif_remote(to_duckdb=TRUE)....slow!", {
-
-  skip_if_offline()
-  skip_on_cran()
-  skip_on_ci()
-  
-  info <- arrow::arrow_info()
-  has_s3 <- info$capabilities[["s3"]]
-  skip_if_not(has_s3)
-
-  skip("memory not mapped segfault")
-
-  library(arrow, quietly = TRUE)
-  library(dplyr, quietly = TRUE)
-  conn <- gbif_remote(to_duckdb = TRUE)
-  expect_true(inherits(conn, "tbl_dbi"))
-  duckdb::dbDisconnect(conn$src$con, shutdown = TRUE)
-})

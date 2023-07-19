@@ -37,11 +37,11 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
-    aws.s3
+    minioclient
 URL: https://docs.ropensci.org/gbifdb/, https://github.com/ropensci/gbifdb
 BugReports: https://github.com/ropensci/gbifdb
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 VignetteBuilder: knitr

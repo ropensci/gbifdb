@@ -1,5 +1,5 @@
 
-#' Download GBIF data using aws.s3 sync
+#' Download GBIF data using minioclient
 #' 
 #' Sync a local directory with selected release of the AWS copy of GBIF
 
@@ -38,8 +38,8 @@ gbif_download <-
            region = ""
            ){
 
-  if (!requireNamespace("aws.s3", quietly = TRUE)) {
-    message("the aws.s3 package is required for automatic download")
+  if (!requireNamespace("minioclient", quietly = TRUE)) {
+    message("the minioclient package is required for automatic download")
     return(invisible(NULL))
   }
   parquet_dir <- gbif_parquet_dir(version, dir)
@@ -50,15 +50,9 @@ gbif_download <-
   ## Public access fails if user has a secret key configured
   
   if (getOption("gbif_unset_aws", TRUE)) unset_aws_env()
-  
-  
-  ## Consider sync via arrow instead?  (very low level interface tho)
-  ## Consider {paws} <https://cran.r-project.org/web/packages/paws/>
-  aws.s3::s3sync(parquet_dir,
-                 base_url = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
-                 direction = "download",
-                 bucket = bucket,
-                 prefix = paste0("occurrence/", version, "/occurrence.parquet"),
-                 region = region,
-                 verbose = FALSE)
+  minioclient::mc_alias_set("aws", base_url, "", "")
+  source <- file.path("aws", bucket, "occurrence", version,
+                      "occurrence.parquet", fsep="/")
+  minioclient::mc_mirror(source, parquet_dir)
+
 }

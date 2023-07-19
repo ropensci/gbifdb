@@ -7,18 +7,19 @@
 gbif_local(
   dir = gbif_parquet_dir(version = gbif_version(local = TRUE)),
   tblname = "gbif",
-  backend = "duckdb",
+  backend = c("duckdb", "arrow"),
   safe = TRUE
 )
 }
 \arguments{
-\item{dir}{the directory containing all parquet files to be read}
+\item{dir}{location of downloaded GBIF parquet files}
 
-\item{tblname}{name of the table to be created in the duckdb VIEW}
+\item{tblname}{name for the database table}
 
-\item{backend}{Use arrow or duckdb as backend connection?}
+\item{backend}{choose duckdb or arrow.}
 
-\item{safe}{logical, default TRUE.  Should we exclude columns \verb{mediatype`` and }issue`?
+\item{safe}{logical. Should we exclude columns \code{mediatype}
+and \code{issue}? (default \code{TRUE}).
 varchar datatype on these columns substantially slows downs queries.}
 }
 \value{
@@ -33,7 +34,6 @@ A summary of this GBIF data, along with column meanings can be found at
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-
 
 gbif <- gbif_local(gbif_example_data())
 \dontshow{\}) # examplesIf}

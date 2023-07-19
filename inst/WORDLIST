@@ -3,6 +3,7 @@ GBIF
 ORCID
 Postgres
 YYYY
+apache
 aws
 dev
 dir
@@ -10,10 +11,9 @@ dplyr
 duckdb
 env
 eu
+fs
 gbif
-github
 https
-md
 microsoft
 opendata
 planetarycomputer
