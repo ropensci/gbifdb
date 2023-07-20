@@ -48,7 +48,7 @@ gbif_download <-
   }
     
   ## Public access fails if user has a secret key configured
-  
+  base_url = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com")
   if (getOption("gbif_unset_aws", TRUE)) unset_aws_env()
   minioclient::mc_alias_set("aws", base_url, "", "")
   source <- file.path("aws", bucket, "occurrence", version,
