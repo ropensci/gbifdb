@@ -27,9 +27,8 @@ ByteCompile: true
 Depends: R (>= 4.0)
 Imports:
     arrow (>= 8.0.0),
-    duckdb (>= 0.3.2),
-    DBI,
-    dplyr
+    dplyr,
+    duckdbfs
 Suggests:
     spelling,
     dbplyr,
@@ -45,3 +44,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Remotes: github::cboettig/duckdbfs

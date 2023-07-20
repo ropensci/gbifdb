@@ -32,6 +32,8 @@ This behavior can also be turned off globally by setting the option
 
 \item{endpoint_override}{optional parameter to \code{\link[arrow:s3_bucket]{arrow::s3_bucket()}}}
 
+\item{backend}{duckdb or arrow}
+
 \item{...}{additional parameters passed to the \code{\link[arrow:s3_bucket]{arrow::s3_bucket()}}}
 }
 \value{

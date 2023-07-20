@@ -9,6 +9,7 @@
 #' @details Query performance is dramatically improved in queries that return only
 #' a subset of columns. Consider using explicit `select()` commands to return only
 #' the columns you need.
+#' @param backend duckdb or arrow
 #' @param version GBIF snapshot date
 #' @param bucket GBIF bucket name (including region). A default can also be set using
 #' the option `gbif_default_bucket`, see [options].
