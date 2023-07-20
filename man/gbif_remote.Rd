@@ -10,7 +10,7 @@ gbif_remote(
   safe = TRUE,
   unset_aws = getOption("gbif_unset_aws", TRUE),
   endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
-  backend = c("duckdb", "arrow"),
+  backend = c("arrow", "duckdb"),
   ...
 )
 }

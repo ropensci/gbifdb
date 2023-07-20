@@ -13,11 +13,9 @@ test_that("gbif_local()", {
   
   skip_on_os("solaris")
   path <- gbif_example_data()
-  gbif <- gbif_local(path)
-  
-  expect_true(inherits(gbif, "tbl"))
-  expect_true(inherits(gbif, "tbl_dbi"))
-  expect_true(inherits(gbif, "tbl_duckdb_connection"))
+  gbif <- gbif_local(path, backend = "arrow")
+  df <- head(gbif) |> dplyr::collect()
+  expect_true(inherits(df, "tbl"))
   
 })
 
@@ -28,6 +26,7 @@ test_that("gbif_dir()", {
 })
 
 test_that("gbif_remote()", {
+  
   skip_on_cran()
   skip_if_offline()
 
@@ -37,7 +36,8 @@ test_that("gbif_remote()", {
 
   conn <- gbif_remote(backend="arrow")
   expect_true(inherits(conn, "arrow_dplyr_query"))
-  
-  #expect_true(inherits(conn, "Dataset"))
+
+  df <- head(conn) |> dplyr::collect()
+  expect_true(inherits(df, "tbl"))
 })
 

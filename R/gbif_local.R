@@ -19,12 +19,12 @@
 #'
 gbif_local <- function(dir = gbif_parquet_dir(version = gbif_version(local=TRUE)),
                        tblname="gbif",
-                       backend = c("duckdb", "arrow"),
+                       backend = c("arrow", "duckdb"),
                        safe = TRUE){
   
   backend <- match.arg(backend)
   gbif <- switch(backend,
-         duckdb = duckdbfs::open_dataset(paste0(dir, "/*"), tblname = "gbif"),
+         duckdb = duckdb_local(dir),
          arrow = arrow::open_dataset(dir)
          )
   if (safe) {
@@ -32,3 +32,9 @@ gbif_local <- function(dir = gbif_parquet_dir(version = gbif_version(local=TRUE)
   }
   gbif
 }
+
+duckdb_local <- function(dir) {
+  requireNamespace("duckdbfs")
+  duckdbfs::open_dataset(paste0(dir, "/*"), tblname = "gbif")
+}
+

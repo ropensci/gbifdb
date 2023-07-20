@@ -40,7 +40,7 @@ gbif_remote <-
              safe = TRUE,
              unset_aws = getOption("gbif_unset_aws", TRUE),
              endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
-             backend = c("duckdb", "arrow"),
+             backend = c("arrow", "duckdb"),
              ...) {
       backend <- match.arg(backend)
       gbif = switch(backend,
@@ -58,6 +58,7 @@ gbif_remote_duckdb <-
   function(version = gbif_version(),
            bucket = gbif_default_bucket()){
     
+    requireNamespace("duckdbfs", quietly=TRUE)
     parquet <- paste("s3:/", bucket, "occurrence", version, 
                       "occurrence.parquet", "*", sep="/")
     

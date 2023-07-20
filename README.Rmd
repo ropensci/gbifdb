@@ -178,7 +178,8 @@ df <- gbif |>
          longitude = round(decimallongitude,1)) |> 
   count(longitude, latitude) |> 
   collect() |> 
-  mutate(n = log(n))
+  mutate(n = log(n)) |>
+  filter(!is.na(n))
 
 r <- rast(df, crs="epsg:4326")
 plot(r, col= viridis(1e3), legend=FALSE, maxcell=6e6, colNA="black", axes=FALSE)
