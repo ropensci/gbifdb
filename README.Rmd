@@ -17,20 +17,15 @@ knitr::opts_chunk$set(
 Sys.unsetenv("AWS_ACCESS_KEY_ID")
 Sys.unsetenv("AWS_SECRET_ACCESS_KEY")
 
-## Use local gbif copy
-options(gbif_unset_aws=FALSE, 
-        gbif_default_bucket="gbif",
-        gbif_default_version="2021-11-01")
-Sys.setenv("GBIF_HOME"="/home/shared-data/gbif",
-           AWS_S3_ENDPOINT = "minio.carlboettiger.info")
+Sys.setenv("GBIF_HOME"="/home/shared-data/gbif")
 
 ```
 
 # gbifdb
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/ropensci/gbifdb/workflows/R-CMD-check/badge.svg)](https://github.com/ropensci/gbifdb/actions)
 [![CRAN status](https://www.r-pkg.org/badges/version/gbifdb)](https://CRAN.R-project.org/package=gbifdb)
+[![R-CMD-check](https://github.com/cboettig/gbifdb/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/cboettig/gbifdb/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of `gbifdb` is to provide a relational database interface to a `parquet` based serializations of `gbif`'s AWS snapshots of its public data [^1].
@@ -123,7 +118,7 @@ This requires over 100 GB free disk space, and will be a time-consuming process 
 However, once downloaded, future queries will run much much faster, particularly if you are network-limited.
 Users can download the current release of GBIF to local storage like so:
 
-```{r download, results="hide"}
+```{r download, eval=FALSE}
 gbif_download()
 ```
 
@@ -178,9 +173,9 @@ Here we quickly generate where color intensity reflects the logarithmic occurren
 library(terra)
 library(viridisLite)
 
-db <- gbif_local()
-df <- db |> mutate(latitude = round(decimallatitude,1),
-                   longitude = round(decimallongitude,1)) |> 
+df <- gbif |>
+  mutate(latitude = round(decimallatitude,1),
+         longitude = round(decimallongitude,1)) |> 
   count(longitude, latitude) |> 
   collect() |> 
   mutate(n = log(n))
