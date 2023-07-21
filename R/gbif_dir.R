@@ -14,11 +14,9 @@ gbif_dir <- function(){
 
 }
 
-
 gbif_parquet_dir <- function(version = gbif_version(),
                              dir = gbif_dir()
                             ){
-  
   file.path(dir,
             "occurrence",
             version,

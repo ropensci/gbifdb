@@ -39,13 +39,17 @@ gbif_version <- function(local = FALSE,
       }
       versions
     },
-    error = function(e) "2021-11-01",
-    finally = "2021-11-01"
+    error = function(e) guess_latest(),
+    finally = guess_latest()
   )
   if(all) return(versions)
   
   
   latest_version(versions)
+}
+
+guess_latest <- function() {
+  paste0(format(Sys.Date(), "%Y-%m"), "-01")
 }
 
 latest_version <- function(versions) {

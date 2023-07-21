@@ -7,10 +7,10 @@
 gbif_remote(
   version = gbif_version(),
   bucket = gbif_default_bucket(),
-  to_duckdb = FALSE,
   safe = TRUE,
   unset_aws = getOption("gbif_unset_aws", TRUE),
   endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
+  backend = c("arrow", "duckdb"),
   ...
 )
 }
@@ -19,8 +19,6 @@ gbif_remote(
 
 \item{bucket}{GBIF bucket name (including region). A default can also be set using
 the option \code{gbif_default_bucket}, see \link{options}.}
-
-\item{to_duckdb}{Return a remote duckdb connection or arrow connection?}
 
 \item{safe}{logical, default TRUE.  Should we exclude columns \code{mediatype} and \code{issue}?
 varchar datatype on these columns substantially slows downs queries.}
@@ -34,14 +32,12 @@ This behavior can also be turned off globally by setting the option
 
 \item{endpoint_override}{optional parameter to \code{\link[arrow:s3_bucket]{arrow::s3_bucket()}}}
 
+\item{backend}{duckdb or arrow}
+
 \item{...}{additional parameters passed to the \code{\link[arrow:s3_bucket]{arrow::s3_bucket()}}}
 }
 \value{
-a remote tibble \code{tbl_sql} class object (by default), or a arrow
-Dataset query if \code{to_duckdb} is FALSE.  In either case, users should call
-\verb{[dplyr::collect]} on the final result to force evaluation and bring the
-resulting data into
-memory in R.
+a remote tibble \code{tbl_sql} class object.
 }
 \description{
 Connect to GBIF remote directly. Can be much faster than downloading

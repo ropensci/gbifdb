@@ -9,10 +9,10 @@
 #' @details Query performance is dramatically improved in queries that return only
 #' a subset of columns. Consider using explicit `select()` commands to return only
 #' the columns you need.
+#' @param backend duckdb or arrow
 #' @param version GBIF snapshot date
 #' @param bucket GBIF bucket name (including region). A default can also be set using
 #' the option `gbif_default_bucket`, see [options].
-#' @param to_duckdb Return a remote duckdb connection or arrow connection?
 #' @param safe logical, default TRUE.  Should we exclude columns `mediatype` and `issue`?
 #' varchar datatype on these columns substantially slows downs queries.
 #' @param unset_aws Unset AWS credentials?  GBIF is provided in a public bucket,
@@ -23,11 +23,7 @@
 #' `gbif_unset_aws` to FALSE (e.g. to use an alternative network endpoint)
 #' @param endpoint_override optional parameter to [arrow::s3_bucket()]
 #' @param ... additional parameters passed to the [arrow::s3_bucket()]
-#' @return a remote tibble `tbl_sql` class object (by default), or a arrow 
-#' Dataset query if `to_duckdb` is FALSE.  In either case, users should call
-#'  `[dplyr::collect]` on the final result to force evaluation and bring the
-#'   resulting data into 
-#' memory in R.
+#' @return a remote tibble `tbl_sql` class object.
 #' @details 
 #' A summary of this GBIF data, along with column meanings can be found at 
 #' <https://github.com/gbif/occurrence/blob/master/aws-public-data.md>
@@ -41,37 +37,56 @@
 gbif_remote <-
     function(version = gbif_version(),
              bucket = gbif_default_bucket(),
-             to_duckdb = FALSE,
              safe = TRUE,
              unset_aws = getOption("gbif_unset_aws", TRUE),
              endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
+             backend = c("arrow", "duckdb"),
              ...) {
-        if (!requireNamespace("arrow", quietly = TRUE)) {
-            stop("please install arrow first")
-        }
+      backend <- match.arg(backend)
+      gbif = switch(backend,
+             arrow = gbif_remote_arrow(version, bucket, unset_aws,
+                                       endpoint_override, ...),
+             duckdb = gbif_remote_duckdb(version, bucket))
 
-        if (unset_aws) {
-          unset_aws_env()
-        }
-        server <-
-         arrow::s3_bucket(bucket, endpoint_override = endpoint_override, ...)
-        prefix <- 
-          paste0("/occurrence/",
-                 version,
-                 "/occurrence.parquet/")
-        path <- server$path(prefix)
-        gbif <- arrow::open_dataset(path)
-
-        ## Consider leaving this to the user to call.
-        if (to_duckdb) {
-            gbif <- arrow::to_duckdb(gbif)
-        }
-        
         if (safe) {
           gbif <- dplyr::select(gbif, -dplyr::any_of(c("mediatype", "issue")))
         }
         gbif
     }
+
+gbif_remote_duckdb <-
+  function(version = gbif_version(),
+           bucket = gbif_default_bucket()){
+    
+    requireNamespace("duckdbfs", quietly=TRUE)
+    parquet <- paste("s3:/", bucket, "occurrence", version, 
+                      "occurrence.parquet", "*", sep="/")
+    
+    duckdbfs::open_dataset(parquet)
+    
+  }
+
+           
+
+gbif_remote_arrow <-
+  function(version = gbif_version(),
+           bucket = gbif_default_bucket(),
+           unset_aws = getOption("gbif_unset_aws", TRUE),
+           endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
+           ...) {
+    if (!requireNamespace("arrow", quietly = TRUE)) {
+      stop("please install arrow first")
+    }
+    if (unset_aws) { unset_aws_env() }
+    server <- arrow::s3_bucket(bucket, 
+                               endpoint_override = endpoint_override, 
+                               ...)
+    prefix <- paste0("/occurrence/", version,  "/occurrence.parquet/")
+    path <- server$path(prefix)
+    arrow::open_dataset(path)
+  }
+
+
 
 
 unset_aws_env <- function(){

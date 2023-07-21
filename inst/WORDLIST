@@ -11,10 +11,9 @@ duckdb
 env
 eu
 gbif
-github
 https
-md
 microsoft
+minioclient
 opendata
 planetarycomputer
 rasterize
