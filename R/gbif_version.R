@@ -35,7 +35,7 @@ gbif_version <- function(local = FALSE,
       if(local) {
         versions <- local_versions(dir)
       } else {
-        versions <- remote_versions(bucket, ...)
+        versions <- guess_latest() #remote_versions(bucket, ...)
       }
       versions
     },
@@ -58,10 +58,14 @@ latest_version <- function(versions) {
   )
 }
 
+
+
+
 remote_versions <- function(bucket = gbif_default_bucket(), 
                             endpoint_override = Sys.getenv("AWS_S3_ENDPOINT"),
                             ...) {
   
+  requireNamespace("arrow", quietly = TRUE)
   if (getOption("gbif_unset_aws", TRUE)) unset_aws_env()
   s3 <- arrow::s3_bucket(bucket, endpoint_override=endpoint_override, ...)
   versions <- basename(s3$ls("occurrence"))

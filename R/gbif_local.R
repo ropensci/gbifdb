@@ -35,6 +35,25 @@ gbif_local <- function(dir = gbif_parquet_dir(version = gbif_version(local=TRUE)
 
 duckdb_local <- function(dir) {
   requireNamespace("duckdbfs")
-  duckdbfs::open_dataset(paste0(dir, "/*"), tblname = "gbif")
+  
+  con <- duckdbfs::cached_connection()
+  has <- DBI::dbListTables(con)
+  if("gbif" %in% has) {
+    return(dplyr::tbl(con, "gbif"))
+  }
+  load_spatial(con)
+  duckdbfs::open_dataset(paste0(dir, "/*"),
+                         tblname = "gbif",
+                         conn = con)
 }
+
+
+load_spatial <- function(conn = duckdbfs::cached_connection()) {
+  status <- DBI::dbExecute(conn, "INSTALL 'spatial';")
+  status <- DBI::dbExecute(conn, "LOAD 'spatial';")
+  invisible(status)
+}
+
+
+
 

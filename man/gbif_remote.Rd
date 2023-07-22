@@ -8,7 +8,7 @@ gbif_remote(
   version = gbif_version(),
   bucket = gbif_default_bucket(),
   safe = TRUE,
-  unset_aws = getOption("gbif_unset_aws", TRUE),
+  unset_aws = getOption("gbif_unset_aws", FALSE),
   endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
   backend = c("arrow", "duckdb"),
   ...

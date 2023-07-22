@@ -38,7 +38,7 @@ gbif_remote <-
     function(version = gbif_version(),
              bucket = gbif_default_bucket(),
              safe = TRUE,
-             unset_aws = getOption("gbif_unset_aws", TRUE),
+             unset_aws = getOption("gbif_unset_aws", FALSE),
              endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
              backend = c("arrow", "duckdb"),
              ...) {
@@ -66,8 +66,6 @@ gbif_remote_duckdb <-
     
   }
 
-           
-
 gbif_remote_arrow <-
   function(version = gbif_version(),
            bucket = gbif_default_bucket(),
@@ -90,11 +88,9 @@ gbif_remote_arrow <-
 
 
 unset_aws_env <- function(){
-    
     ## Consider re-setting these afterwards.
     ## What about ~/.aws ?
     ## Maybe set these to empty strings instead of unsetting?
-    
     ## Would be nice if we could simply override the detection of these
     Sys.unsetenv("AWS_DEFAULT_REGION")
     Sys.unsetenv("AWS_S3_ENDPOINT")
