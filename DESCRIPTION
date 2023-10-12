@@ -1,5 +1,5 @@
 Package: gbifdb
-Version: 0.1.2
+Version: 1.0.0
 Title: High Performance Interface to 'GBIF'
 Description: A high performance interface to the Global Biodiversity
   Information Facility, 'GBIF'.  In contrast to 'rgbif', which can

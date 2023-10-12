@@ -1,17 +1,17 @@
-# gbifdb 0.1.2
-
-* include links in DESCRIPTION to the unpublished methods implemented in arrow and duckdb for high-performance access.
-* update documentation to include return value on all exported functions.
 # gbifdb 1.0.0
 
-* `gbif_download()` now uses `minioclient` as a backend, offering dramatically better performance, especially on multi-core machines with high bandwidth network connections.  
+* `gbif_download()` now uses `minioclient` as a backend, offering dramatically (100x+) better performance, especially on multi-core machines with high bandwidth network connections.  
 
-* 
+* `gbif_local()` now defaults to duckdb backend, and utilizes duckdbfs to streamline the interface.  The latest performance of `duckdb` is substantially better than alternatives.
 
 Breaking changes
 
 * `gbif_conn()` is deprecated
 
+# gbifdb 0.1.2
+
+* include links in DESCRIPTION to the unpublished methods implemented in arrow and duckdb for high-performance access.
+* update documentation to include return value on all exported functions.
 
 
 # gbifdb 0.1.1
