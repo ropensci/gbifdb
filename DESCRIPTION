@@ -26,10 +26,10 @@ Encoding: UTF-8
 ByteCompile: true
 Depends: R (>= 4.0)
 Imports:
-    arrow (>= 8.0.0),
     dplyr,
     duckdbfs
 Suggests:
+    arrow (>= 8.0.0),
     spelling,
     dbplyr,
     testthat (>= 3.0.0),
@@ -44,3 +44,4 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+Additional_repositories: https://p3m.dev/cran/2024-02-02/

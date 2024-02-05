@@ -21,8 +21,8 @@
 #' this will unset any set environmental variables for the duration of the R session.
 #' This behavior can also be turned off globally by setting the option
 #' `gbif_unset_aws` to FALSE (e.g. to use an alternative network endpoint)
-#' @param endpoint_override optional parameter to [arrow::s3_bucket()]
-#' @param ... additional parameters passed to the [arrow::s3_bucket()]
+#' @param endpoint_override optional parameter to `arrow::s3_bucket()`
+#' @param ... additional parameters passed to the `arrow::s3_bucket()`
 #' @return a remote tibble `tbl_sql` class object.
 #' @details 
 #' A summary of this GBIF data, along with column meanings can be found at 
@@ -42,7 +42,7 @@ gbif_remote <-
              endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
              backend = c("arrow", "duckdb"),
              ...) {
-      backend <- match.arg(backend)
+      backend <- select_backend(backend)
       gbif = switch(backend,
              arrow = gbif_remote_arrow(version, bucket, unset_aws,
                                        endpoint_override, ...),
@@ -74,9 +74,7 @@ gbif_remote_arrow <-
            unset_aws = getOption("gbif_unset_aws", TRUE),
            endpoint_override = Sys.getenv("AWS_S3_ENDPOINT", "s3.amazonaws.com"),
            ...) {
-    if (!requireNamespace("arrow", quietly = TRUE)) {
-      stop("please install arrow first")
-    }
+    check_arrow_installed()
     if (unset_aws) { unset_aws_env() }
     server <- arrow::s3_bucket(bucket, 
                                endpoint_override = endpoint_override, 

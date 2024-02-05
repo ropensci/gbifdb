@@ -11,7 +11,7 @@ test_that("gbif_example_data()", {
 
 test_that("gbif_local()", {
   
-  skip_on_os("solaris")
+  skip_if_not_installed("arrow")
   path <- gbif_example_data()
   gbif <- gbif_local(path, backend = "arrow")
   df <- head(gbif) |> dplyr::collect()
@@ -29,6 +29,7 @@ test_that("gbif_remote()", {
   
   skip_on_cran()
   skip_if_offline()
+  skip_if_not_installed("arrow")
 
   info <- arrow::arrow_info()
   has_s3 <- info$capabilities[["s3"]]

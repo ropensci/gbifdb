@@ -5,7 +5,7 @@
 #' @param dir local directory ([gbif_dir()])
 #' @param bucket Which remote bucket (region) should be checked
 #' @param all show all versions? (logical, default `FALSE`)
-#' @param ... additional arguments to [arrow::s3_bucket]
+#' @param ... additional arguments to `arrow::s3_bucket`
 #' @export
 #' @details A default version can be set using option `gbif_default_version`
 #' @return latest available gbif version, string
@@ -61,7 +61,8 @@ latest_version <- function(versions) {
 remote_versions <- function(bucket = gbif_default_bucket(), 
                             endpoint_override = Sys.getenv("AWS_S3_ENDPOINT"),
                             ...) {
-  
+
+  check_arrow_installed()
   if (getOption("gbif_unset_aws", TRUE)) unset_aws_env()
   s3 <- arrow::s3_bucket(bucket, endpoint_override=endpoint_override, ...)
   versions <- basename(s3$ls("occurrence"))

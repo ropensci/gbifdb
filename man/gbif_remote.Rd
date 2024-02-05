@@ -30,11 +30,11 @@ this will unset any set environmental variables for the duration of the R sessio
 This behavior can also be turned off globally by setting the option
 \code{gbif_unset_aws} to FALSE (e.g. to use an alternative network endpoint)}
 
-\item{endpoint_override}{optional parameter to \code{\link[arrow:s3_bucket]{arrow::s3_bucket()}}}
+\item{endpoint_override}{optional parameter to \code{arrow::s3_bucket()}}
 
 \item{backend}{duckdb or arrow}
 
-\item{...}{additional parameters passed to the \code{\link[arrow:s3_bucket]{arrow::s3_bucket()}}}
+\item{...}{additional parameters passed to the \code{arrow::s3_bucket()}}
 }
 \value{
 a remote tibble \code{tbl_sql} class object.

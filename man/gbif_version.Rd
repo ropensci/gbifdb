@@ -21,7 +21,7 @@ gbif_version(
 
 \item{all}{show all versions? (logical, default \code{FALSE})}
 
-\item{...}{additional arguments to \link[arrow:s3_bucket]{arrow::s3_bucket}}
+\item{...}{additional arguments to \code{arrow::s3_bucket}}
 }
 \value{
 latest available gbif version, string

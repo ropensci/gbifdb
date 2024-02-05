@@ -22,7 +22,7 @@ gbif_local <- function(dir = gbif_parquet_dir(version = gbif_version(local=TRUE)
                        backend = c("arrow", "duckdb"),
                        safe = TRUE){
   
-  backend <- match.arg(backend)
+  backend <- select_backend(backend)
   gbif <- switch(backend,
          duckdb = duckdb_local(dir),
          arrow = arrow::open_dataset(dir)
