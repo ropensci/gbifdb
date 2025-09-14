@@ -20,5 +20,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Carl Boettiger \email{cboettig@gmail.com} (\href{https://orcid.org/0000-0002-1642-628X}{ORCID})
 
+Other contributors:
+\itemize{
+  \item Marc-Olivier Beausoleil \email{marc-olivier.beausoleil@mail.mcgill.ca} (\href{https://orcid.org/0000-0003-3717-3223}{ORCID}) [contributor]
+}
+
 }
 \keyword{internal}

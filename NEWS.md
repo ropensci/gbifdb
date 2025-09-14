@@ -1,3 +1,7 @@
+# gbifdb 1.0.0.99 
+
+* updated description for `gbif_download()` function explaining the current license in the snapshot (see https://github.com/ropensci/gbifdb/issues/13)
+
 # gbifdb 1.0.0
 
 * `gbif_download()` now uses `minioclient` as a backend, offering dramatically (100x+) better performance, especially on multi-core machines with high bandwidth network connections.  
