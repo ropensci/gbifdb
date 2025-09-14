@@ -40,9 +40,9 @@ https://planetarycomputer.microsoft.com/dataset/gbif
 
 Also, some users may prefer to download this data using an alternative
 interface or work on a cloud-host machine where data is already available.
-Note, these data include all CC0 and CC-BY licensed data in GBIF that have
-coordinates which passed automated quality checks,
-see \url{https://github.com/gbif/occurrence/blob/master/aws-public-data.md}.
+Note, these data include all CC0, CC-BY and CC-BY-NC licensed data in GBIF.
+The data snapshot description and dataset details is available at this link:
+\url{https://github.com/gbif/occurrence/blob/master/aws-public-data.md}.
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
